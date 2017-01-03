@@ -7,15 +7,19 @@ class LojaWPPagSeguro
 {
   protected $pluginPath;
   protected $pluginUrl;
+  protected $prefix;
 
   public function __construct()
   {
     $this->pluginPath = dirname(__FILE__);
 
-    $this->pluginUrl = WP_PLUGIN_URL . '/loja-wp-pagseguro';
+    $this->pluginUrl = WP_PLUGIN_URL . '\loja-wp-pagseguro';
+
+    $this->prefix = '_vhr_';
 
     add_action( 'init', array($this, 'vhr_loja_cpt') );
-    add_action( 'cmb2_admin_init', array($this, 'vhr_metaboxes'));
+    add_action( 'cmb2_admin_init', array($this, 'vhr_metaboxes_cmb2'));
+    add_action( 'admin_init', array($this, 'vhr_metaboxes'));
   }
 
   public function vhr_loja_cpt(){
@@ -49,7 +53,7 @@ class LojaWPPagSeguro
   		'has_archive'        => true,
   		'hierarchical'       => false,
   		'menu_position'      => null,
-  		'supports'           => array( 'title', 'thumbnail', 'excerpt')
+  		'supports'           => array( 'title', 'thumbnail')
   	);
 
     register_post_type( 'loja-cpt', $args );
@@ -57,8 +61,66 @@ class LojaWPPagSeguro
     flush_rewrite_rules();
   }
 
+  public function vhr_metaboxes_cmb2(){
+    /**
+     * Descrição do Evento
+     */
+
+    $descricao = new_cmb2_box(array(
+      'id'  => 'descricao_metabox',
+      'title' => 'Breve descrição sobre o evento',
+      'object_types'  => array('loja-cpt'),
+      'context'   => 'normal',
+      'priority'  => 'high',
+      'show_names'  => false
+    ));
+
+    $descricao->add_field(array(
+      'id'  => $this->prefix . 'desc',
+      'title' => 'Breve descrição sobre o evento',
+      'type'  => 'wysiwyg'
+    ));
+
+    /**
+     * Mapa de mesas
+     */
+
+     $mapa = new_cmb2_box(array(
+       'id'  => 'mapa_metabox',
+       'title' => 'Mapa de mesas do evento',
+       'object_types'  => array('loja-cpt'),
+       'context'   => 'side',
+       'priority'  => 'core',
+       'show_names'  => false
+     ));
+
+     $mapa->add_field(array(
+       'id'     => $this->prefix . 'mesas',
+       'title'  => 'Mapa de mesas do evento',
+       'desc'   => '',
+       'type'   => 'file',
+       'options' => array(
+            'url' => false,
+        ),
+       'text'   => array(
+         'add_upload_file_text' => 'Adicionar imagem do mapa de mesas'
+       )
+     ));
+
+  }
+
   public function vhr_metaboxes(){
-    
+    /**
+     * Páginas relacionadas ao Evento
+     */
+
+    /**
+     * Datas para o Evento
+     */
+
+    /**
+     *
+     */
   }
 
 }
