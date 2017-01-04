@@ -12,6 +12,8 @@ define('LOJA_ROOT', plugin_dir_path( __FILE__ ));
 
 require LOJA_ROOT . 'pagseguro/vendor/autoload.php';
 require LOJA_ROOT . 'cmb2/init.php';
+require LOJA_ROOT . 'vhr-functions.php';
+require LOJA_ROOT . 'cmb2-conditionals/cmb2-conditionals.php';
 require LOJA_ROOT . 'class-loja-structure.php';
 
 $app = new LojaWPPagSeguro;

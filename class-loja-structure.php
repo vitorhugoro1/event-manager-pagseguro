@@ -161,7 +161,8 @@ class LojaWPPagSeguro
        'object_types'  => array('loja-cpt'),
        'context'   => 'normal',
        'priority'  => 'core',
-       'show_names'  => true
+       'show_names'  => true,
+       'show_on'    => array('alt_key' => 'valores', 'alt_value' => 'post-new.php')
     ));
 
     $valores_group_id = $valores->add_field(array(
@@ -190,36 +191,52 @@ class LojaWPPagSeguro
 
 	  $valores->add_group_field( $valores_group_id, array(
 		  'name' => 'Dias',
-		  'id'   => 'dias-multiplo',
+		  'id'   => 'dia-multiplo',
 		  'type' => 'multicheck',
-		  'options' => array(
-			  'check1' => 'Check One',
-			  'check2' => 'Check Two',
-			  'check3' => 'Check Three',
-		  ),
-          'show_on'  => array($this, 'vhr_multiplo_check')
+		  'options' => array($this, 'vhr_load_data_values'),
+      'attributes' => array(
+  			'data-conditional-id'    => wp_json_encode( array( $valores_group_id, 'multiplo' ) ),
+  			'data-conditional-value' => 'on',
+  		),
 	  ) );
+
+    $valores->add_group_field( $valores_group_id, array(
+		  'name' => 'Dia',
+		  'id'   => 'dia-simples',
+		  'type' => 'radio_inline',
+      'options' => array($this, 'vhr_load_data_values'),
+      'attributes'  => array(
+  			'required'               => true, // Will be required only if visible.
+  			'data-conditional-id'    => wp_json_encode( array( $valores_group_id, 'multiplo' ) ),
+  			'data-conditional-value' => 'off',
+  		),
+	  ) );
+
   }
 
-  public function vhr_multiplo_check(){
+  public function vhr_load_data_values(){
+    global $post_ID, $pagenow;
 
+    $datas = array();
+
+    if($pagenow == 'post-new.php')
+        return array();
+
+    $dates = get_post_meta($post_ID, '_vhr_data', true);
+
+    foreach((array) $dates as $key => $date){
+      $datas[$key] = date('d/m/Y', $date['data']);
+    }
+
+    return $datas;
   }
 
   public function vhr_metaboxes(){
-    /**
-     *  Dados do Evento (valores)
-     */
 
     /**
      * Páginas relacionadas ao Evento
      */
 
-
-
-    /**
-     *
-     */
   }
-
 
 }
