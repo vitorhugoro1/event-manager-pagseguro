@@ -157,7 +157,7 @@ class LojaWPPagSeguro
 
     $valores = new_cmb2_box(array(
        'id'     => 'valores_metabox',
-       'title' => 'Valores dos ingressos',
+       'title' => 'Valores dos ingressos para visitantes',
        'object_types'  => array('loja-cpt'),
        'context'   => 'normal',
        'priority'  => 'core',
