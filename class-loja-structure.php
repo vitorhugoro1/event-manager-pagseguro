@@ -126,8 +126,8 @@ class LojaWPPagSeguro
       'type'  => 'group',
       'options' => array(
         'group_title' => 'Dia {#}',
-        'add_button'    => __( 'Add Another Entry', 'cmb2' ),
-        'remove_button' => __( 'Remove Entry', 'cmb2' ),
+        'add_button'    => 'Adicionar data',
+        'remove_button' => 'Remover data',
         'sortable'      => true, // beta
       )
     ));
