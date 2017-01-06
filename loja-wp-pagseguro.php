@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Loja WP PagSeguro
-Version: 0.1
-Plugin URI: ${TM_PLUGIN_BASE}
+Version: 0.4
+Plugin URI: https://github.com/vitorhugoro1/loja-wp-pagseguro
 Description:
-Author: ${TM_NAME}
-Author URI: ${TM_HOMEPAGE}
+Author: Vitor Hugo R Merencio (Polyvenn)
+Author URI: https://github.com/vitorhugoro1/
 */
 
 define('LOJA_ROOT', plugin_dir_path( __FILE__ ));
@@ -16,8 +16,7 @@ require LOJA_ASSETS . 'load-assets.php';
 require LOJA_ROOT . 'cmb2/init.php';
 require LOJA_ROOT . 'vhr-functions.php';
 require LOJA_ROOT . 'cmb2-conditionals/cmb2-conditionals.php';
-require LOJA_ROOT . 'class-loja-structure.php';
+require LOJA_ROOT . 'class-post-types.php';
+require LOJA_ROOT . 'class-meta-boxes.php';
+require LOJA_ROOT . 'class-loja-init.php';
 
-$app = new LojaWPPagSeguro;
-
-?>
