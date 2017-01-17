@@ -1,0 +1,11 @@
+.select2-drop {
+  z-index: 99999999 !important;
+}
+
+.ingresso-table {
+  margin-bottom: 1rem;
+}
+
+#ingresso-selector-box {
+  display: none;
+}
