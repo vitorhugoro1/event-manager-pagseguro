@@ -13,7 +13,7 @@ class VHR_Ingresso_Functions
     if('post-new.php' !== $pagenow){
       add_meta_box( 'ingresso_info_box', 'Informações', array('VHR_Ingresso_Functions', 'vhr_infos_box_build'), 'ingresso', 'normal', 'default' );
       add_meta_box( 'vhr_ingresso_selector_box', 'Itens do Pedido', array('VHR_Ingresso_Functions', 'vhr_ingresso_selector_box'), 'ingresso', 'normal', 'default' );
-    }
+      }
   }
 
   public function vhr_script_style_list(){
@@ -99,13 +99,44 @@ class VHR_Ingresso_Functions
             </th>
           </thead>
           <tbody>
-            <tr class='none'>
-              <td>
-                <p>
-                  Nenhum ingresso
-                </p>
-              </td>
-            </tr>
+          <?php
+          $ingressos = array(
+            array(
+              "tipo"  => 1,
+              "qtd" => 2,
+              "valor" => 50
+            ),
+            array(
+              "tipo"  => 2,
+              "qtd" => 1,
+              "valor" => 100
+            ),
+          );
+            // $ingressos = get_post_meta($post_id,'_vhr_ingressos_list', true);
+
+            if(!empty($ingressos)){
+              
+              foreach((array) $ingressos as $k => $ingresso):
+                echo '<tr>';
+                echo '<td>' . $k . '</td>';
+                echo '<td>' . $ingresso['tipo'] . '</td>';
+                echo '<td>' . $ingresso['qtd'] . '</td>';
+                echo '<td>' . $ingresso['valor'] . '</td>';
+                echo '</tr>';
+              endforeach;
+            } else {
+              ?>
+                <tr class='none'>
+                  <td>
+                    <p>
+                      Nenhum ingresso
+                    </p>
+                  </td>
+                </tr>
+              <?php  
+            }
+          ?>
+            
           </tbody>
           <tfoot>
             <tr>
@@ -113,7 +144,7 @@ class VHR_Ingresso_Functions
                 <label class="alignright">Valor Total</label>
               </td>
               <td>
-                R$ 00.00
+                <?php echo '00.00'; ?>
               </td>
             </tr>
           </tfoot>
@@ -131,11 +162,20 @@ class VHR_Ingresso_Functions
                 <td>
                   <select class="widefat" id="tipo-ingresso">
                     <option value="">Selecione um tipo</option>
-                    <option value="0">option 0</option>
-                    <option value="1">option 1</option>
-                    <option value="2">option 2</option>
-                    <option value="3">option 3</option>
-                    <option value="4">option 4</option>
+                    <?php 
+                      $evento_id = get_post_meta($post_id, 'evento', true);
+
+                      if($evento_id):
+                        $tipos = get_post_meta($post_id, '_vhr_valores', true);
+
+                        foreach((array) $tipos as $tipo_id => $tipo):
+                          ?>
+                            <option value="<?php echo $tipo_id; ?>"><?php echo 'Ingresso ' . $tipo_id; ?></option>
+                          <?php
+                        endforeach;
+                      
+                      endif;
+                    ?>
                   </select>
                 </td>
               </tr>
