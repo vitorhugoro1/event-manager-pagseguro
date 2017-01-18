@@ -127,7 +127,7 @@ jQuery(document).ready(function($) {
     }
   });
 
-  $("input[data-id='remover']").on('change', function(e){
+  $(document).on('change', "input[data-id='remover']", function(e){
     e.preventDefault();
 
     if($(this).is(':checked')){
