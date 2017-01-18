@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Loja WP PagSeguro
-Version: 0.4
+Version: 0.6
 Plugin URI: https://github.com/vitorhugoro1/loja-wp-pagseguro
 Description:
 Author: Vitor Hugo R Merencio (Polyvenn)
