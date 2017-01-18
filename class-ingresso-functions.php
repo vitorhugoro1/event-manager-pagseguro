@@ -20,10 +20,7 @@ class VHR_Ingresso_Functions
     global $pagenow, $post_type;
 
     if('post-new.php' !== $pagenow ){
-      wp_register_style( 'select2css', 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css', false, '1.0', 'all' );
-      wp_register_script( 'select2', 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js', array( 'jquery' ), '1.0', true );
-      wp_enqueue_style( 'select2css' );
-      wp_enqueue_script( 'select2' );
+
     }
   }
 
@@ -115,13 +112,13 @@ class VHR_Ingresso_Functions
             // $ingressos = get_post_meta($post_id,'_vhr_ingressos_list', true);
 
             if(!empty($ingressos)){
-              
+
               foreach((array) $ingressos as $k => $ingresso):
                 echo '<tr>';
                 echo '<td>' . $k . '</td>';
                 echo '<td>' . $ingresso['tipo'] . '</td>';
                 echo '<td>' . $ingresso['qtd'] . '</td>';
-                echo '<td>' . $ingresso['valor'] . '</td>';
+                echo '<td>' . 'R$ ' . number_format($ingresso['valor'], 2, ',', '.') . '</td>';
                 echo '</tr>';
               endforeach;
             } else {
@@ -133,10 +130,10 @@ class VHR_Ingresso_Functions
                     </p>
                   </td>
                 </tr>
-              <?php  
+              <?php
             }
           ?>
-            
+
           </tbody>
           <tfoot>
             <tr>
@@ -162,10 +159,11 @@ class VHR_Ingresso_Functions
                 <td>
                   <select class="widefat" id="tipo-ingresso">
                     <option value="">Selecione um tipo</option>
-                    <?php 
-                      $evento_id = get_post_meta($post_id, 'evento', true);
+                    <?php
+                    $post_id = 87;
+                      // $evento_id = get_post_meta($post_id, 'evento', true);
 
-                      if($evento_id):
+                      if($post_id):
                         $tipos = get_post_meta($post_id, '_vhr_valores', true);
 
                         foreach((array) $tipos as $tipo_id => $tipo):
@@ -173,7 +171,7 @@ class VHR_Ingresso_Functions
                             <option value="<?php echo $tipo_id; ?>"><?php echo 'Ingresso ' . $tipo_id; ?></option>
                           <?php
                         endforeach;
-                      
+
                       endif;
                     ?>
                   </select>
