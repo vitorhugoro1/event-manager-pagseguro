@@ -4,7 +4,6 @@ class VHR_Ingresso_Functions
 {
   public function init(){
     add_action( 'admin_init', array(__CLASS__, 'vhr_infos_box') );
-    add_action( 'admin_enqueue_scripts', array(__CLASS__, 'vhr_script_style_list') );
   }
 
   public function vhr_infos_box(){
@@ -14,14 +13,6 @@ class VHR_Ingresso_Functions
       add_meta_box( 'ingresso_info_box', 'Informações', array('VHR_Ingresso_Functions', 'vhr_infos_box_build'), 'ingresso', 'normal', 'default' );
       add_meta_box( 'vhr_ingresso_selector_box', 'Itens do Pedido', array('VHR_Ingresso_Functions', 'vhr_ingresso_selector_box'), 'ingresso', 'normal', 'default' );
       }
-  }
-
-  public function vhr_script_style_list(){
-    global $pagenow, $post_type;
-
-    if('post-new.php' !== $pagenow ){
-
-    }
   }
 
   public function vhr_infos_box_build(){
@@ -58,7 +49,8 @@ class VHR_Ingresso_Functions
               </label>
             </th>
             <td>
-              <input class="evento-auto" type="text" name="evento" value=""> - <a>Editar</a>
+              <?php // echo get_the_title(get_post_meta( get_the_id(), 'evento', true )); ?>
+              <?php echo get_the_title(87); ?>
             </td>
           </tr>
           <tr>
@@ -83,7 +75,7 @@ class VHR_Ingresso_Functions
         <table class="widefat ingresso-table">
           <thead>
             <th>
-              ID
+              &nbsp;
             </th>
             <th>
               Tipo
@@ -101,7 +93,7 @@ class VHR_Ingresso_Functions
             array(
               "tipo"  => 1,
               "qtd" => 2,
-              "valor" => 50
+              "valor" => 50.00
             ),
             array(
               "tipo"  => 2,
@@ -109,17 +101,32 @@ class VHR_Ingresso_Functions
               "valor" => 100
             ),
           );
+
+          $total = 00.00;
             // $ingressos = get_post_meta($post_id,'_vhr_ingressos_list', true);
 
             if(!empty($ingressos)){
 
               foreach((array) $ingressos as $k => $ingresso):
-                echo '<tr>';
-                echo '<td>' . $k . '</td>';
-                echo '<td>' . $ingresso['tipo'] . '</td>';
-                echo '<td>' . $ingresso['qtd'] . '</td>';
-                echo '<td>' . 'R$ ' . number_format($ingresso['valor'], 2, ',', '.') . '</td>';
-                echo '</tr>';
+                  ?>
+                  <tr data-id="<?php echo $k; ?>">
+                    <td>
+                      <input type="checkbox" data-id="remover" value="<?php echo $k; ?>">
+                    </td>
+                    <td>
+                      <input type="hidden" name="ingressos[<?php echo $k; ?>][tipo]" value="<?php echo $ingresso['tipo']; ?>">
+                      <?php echo 'Ingresso '. ($ingresso['tipo'] + 1); ?>
+                    </td>
+                    <td>
+                      <input type="hidden" name="ingressos[<?php echo $k; ?>][qtd]" value="<?php echo $ingresso['qtd']; ?>">
+                      <?php echo $ingresso['qtd']; ?>
+                    </td>
+                    <td>
+                      <input type="hidden" name="ingressos[<?php echo $k; ?>][valor]" value="<?php echo $ingresso['valor']; ?>">
+                      <?php echo 'R$ ' . number_format($ingresso['valor'], 2, ',', '.'); ?>
+                    </td>
+                  </tr>
+                  <?php
               endforeach;
             } else {
               ?>
@@ -141,12 +148,14 @@ class VHR_Ingresso_Functions
                 <label class="alignright">Valor Total</label>
               </td>
               <td>
-                <?php echo '00.00'; ?>
+                <input type="hidden" id="ingressos-total" name="ingressos[total]" value="<?php echo $total; ?>">
+                <?php echo 'R$ ' . number_format($total, 2, ',', '.'); ?>
               </td>
             </tr>
           </tfoot>
         </table>
         <div class="alignright">
+          <a class="button-secondary remover-ingresso" disabled>Remover Selecionados</a>
           <a href="#TB_inline?width=600&height=550&inlineId=ingresso-selector-box" class="button-primary thickbox">Adicionar +</a>
         </div>
         <div id="ingresso-selector-box">
@@ -185,6 +194,8 @@ class VHR_Ingresso_Functions
                   <input type="number" id="qtd-ingresso" min="1" value="">
                 </td>
               </tr>
+              <input type="hidden" id="valor-ingresso" value="">
+              <input type="hidden" id="valores-json" value="<?php echo htmlspecialchars(json_encode($tipos)); ?>">
             </table>
           <div class="alignright">
             <a id="cancel-ingresso" class="button-secondary">Cancelar</a>
