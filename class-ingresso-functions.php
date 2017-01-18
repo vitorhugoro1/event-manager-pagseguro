@@ -168,7 +168,7 @@ class VHR_Ingresso_Functions
 
                         foreach((array) $tipos as $tipo_id => $tipo):
                           ?>
-                            <option value="<?php echo $tipo_id; ?>"><?php echo 'Ingresso ' . $tipo_id; ?></option>
+                            <option value="<?php echo $tipo_id; ?>"><?php echo 'Ingresso ' . ($tipo_id + 1) ; ?></option>
                           <?php
                         endforeach;
 
