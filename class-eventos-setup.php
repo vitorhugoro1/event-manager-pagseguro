@@ -81,6 +81,14 @@ class VHR_Setup_Eventos  {
                   <input class="regular-text" type="text" name="token" id="token" value="<?php echo get_option('token_pagseguro'); ?>">
                 </td>
               </tr>
+              <tr>
+                <th scope="row">
+                   <label for="sandbox">Usar Sandbox?</label>
+                </th>
+                <td>
+                  <input type="checkbox" name="sandbox" value="1" <?php checked( get_option('sandbox', 1), 1 ); ?>>
+                </td>
+              </tr>
             </tbody>
           </table>
           <?php submit_button(); ?>
@@ -94,9 +102,11 @@ class VHR_Setup_Eventos  {
 
     $email = sanitize_email($_POST['email']);
     $token = sanitize_text_field($_POST['token']);
+    $sandbox = $_POST['sandbox'];
 
     update_option('email_pagseguro', $email);
     update_option('token_pagseguro', $token);
+    update_option('sandbox', $sandbox);
 
     wp_redirect(wp_get_referer());
   }
