@@ -71,7 +71,7 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'context' => 'side',
 				'priority' => 'core',
 				'show_names' => true,
-				'rows_limit'   => 3
+				'rows_limit'   => get_option('rows_limit', 3)
 			));
 
 			$data_group_id = $data->add_field(array(
