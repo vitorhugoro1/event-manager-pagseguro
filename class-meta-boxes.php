@@ -82,7 +82,7 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 					'add_button' => 'Adicionar data',
 					'remove_button' => 'Remover data',
 					'sortable' => true, // beta
-				),
+				)
 			));
 
 			$data->add_group_field($data_group_id, array(
@@ -92,6 +92,7 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'date_format' => 'd/m/Y',
 				'attributes' => array(
 					'placeholder' => 'dd/mm/yyyy',
+					'required' => true, // Will be required only if visible.
 				),
 			));
 
@@ -102,6 +103,24 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'show_option_none' => false,
 				'default' => 'expo',
 				'options' => array(__CLASS__, 'vhr_load_tipo_dia_values'),
+			));
+
+			$data_evento = new_cmb2_box(array(
+				'id' => 'data_evento',
+				'title' => 'Período de Vendas de Ingressos',
+				'object_types' => array('eventos'),
+				'context' => 'side',
+				'priority' => 'core',
+				'show_names' => false,
+			));
+
+			$data_evento->add_field(array(
+				'name'	=> 'Período de Vendas de Ingressos',
+				'id'		=> self::$prefix.'periodo',
+				'type'	=> 'date_range',
+				'attributes' => array(
+					'required' => true, // Will be required only if visible.
+				),
 			));
 
 			$valores = new_cmb2_box(array(
@@ -123,6 +142,13 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 					'remove_button' => 'Remover valor',
 					'sortable' => true, // beta
 				),
+			));
+
+			$valores->add_group_field($valores_group_id, array(
+				'name' => 'Label',
+				'id' => 'label',
+				'desc'	=> 'Identificador do tipo de ingresso',
+				'type' => 'text_medium',
 			));
 
 			$valores->add_group_field($valores_group_id, array(

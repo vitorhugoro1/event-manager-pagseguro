@@ -50,7 +50,7 @@ class VHR_Ingresso_Functions
             </th>
             <td>
               <?php // echo get_the_title(get_post_meta( get_the_id(), 'evento', true )); ?>
-              <?php echo get_the_title(87); ?>
+              <?php echo get_the_title(75); ?>
             </td>
           </tr>
           <tr>
@@ -63,7 +63,43 @@ class VHR_Ingresso_Functions
               <input class="cliente-auto" type="text" name="cliente" value=""> - <a>Editar</a>
             </td>
           </tr>
+          <tr>
+            <th>
+              <label for="transaction_id"></label>
+            </th>
+          </tr>
         </table>
+      </div>
+    <?php
+  }
+
+  public function vhr_transaction_state(){
+      global $post;
+      $estados = array(
+        '1' => 'Aguardando pagamento',
+        '2' => 'Em análise',
+        '3' => 'Paga',
+        '4' => 'Disponível',
+        '5' => 'Em disputa',
+        '6' => 'Devolvida',
+        '7' => 'Cancelada'
+      );
+
+      $transaction = get_post_meta($post->ID, 'transaction_state', true);
+
+      wp_nonce_field('transaction_state');
+    ?>
+      <div>
+          <label for="transaction_state">Estado da transação</label>
+          <select id="transaction_state" name="transaction_state">
+            <?php
+              foreach((array) $estados as $k => $s){
+                ?>
+                  <option value="<?php echo $k; ?>" <?php selected($transaction, $k) ?>><?php echo $s; ?></option>
+                <?php
+              }
+             ?>
+          </select>
       </div>
     <?php
   }
@@ -91,11 +127,13 @@ class VHR_Ingresso_Functions
           <?php
           $ingressos = array(
             array(
+              "label" => "Dia Y",
               "tipo"  => 1,
               "qtd" => 2,
               "valor" => 50.00
             ),
             array(
+              "label" => "Dia Z",
               "tipo"  => 2,
               "qtd" => 1,
               "valor" => 100
@@ -115,7 +153,7 @@ class VHR_Ingresso_Functions
                     </td>
                     <td>
                       <input type="hidden" name="ingressos[<?php echo $k; ?>][tipo]" value="<?php echo $ingresso['tipo']; ?>">
-                      <?php echo 'Ingresso '. ($ingresso['tipo'] + 1); ?>
+                      <?php echo $ingresso['label']; ?>
                     </td>
                     <td>
                       <input type="hidden" name="ingressos[<?php echo $k; ?>][qtd]" value="<?php echo $ingresso['qtd']; ?>">
@@ -169,7 +207,7 @@ class VHR_Ingresso_Functions
                   <select class="widefat" id="tipo-ingresso">
                     <option value="">Selecione um tipo</option>
                     <?php
-                    $post_id = 87;
+                    $post_id = 75;
                       // $evento_id = get_post_meta($post_id, 'evento', true);
 
                       if($post_id):
@@ -177,7 +215,7 @@ class VHR_Ingresso_Functions
 
                         foreach((array) $tipos as $tipo_id => $tipo):
                           ?>
-                            <option value="<?php echo $tipo_id; ?>"><?php echo 'Ingresso ' . ($tipo_id + 1) ; ?></option>
+                            <option value="<?php echo $tipo_id; ?>"><?php echo $tipo['label'] ; ?></option>
                           <?php
                         endforeach;
 

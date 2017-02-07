@@ -40,7 +40,7 @@ function addIngresso(){
               '<input type="checkbox" data-id="remover" value="' + ($last_id + 1)  + '">' +
             '</td>';
     $add += '<td><input type="hidden" name="ingressos[' + ($last_id + 1)  + '][tipo]" value="' + $tipo  + '">' +
-              'Ingresso ' + (parseInt($tipo) + 1)  +
+              jQuery("#tipo-ingresso option:selected").text()  +
             '</td>' +
             '<td><input type="hidden" name="ingressos[' + ($last_id + 1)  + '][qtd]" value="' + $qtd  + '">' +
               $qtd +
