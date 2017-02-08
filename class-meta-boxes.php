@@ -82,7 +82,12 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 					'add_button' => 'Adicionar data',
 					'remove_button' => 'Remover data',
 					'sortable' => true, // beta
-				)
+				),
+				'column' => array(
+					'position'	=> 2,
+					'name'			=> 'Datas do evento'
+				),
+				'display_cb'	=> array(__CLASS__, 'display_data_column')
 			));
 
 			$data->add_group_field($data_group_id, array(
@@ -110,7 +115,7 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'title' => 'Período de Vendas de Ingressos',
 				'object_types' => array('eventos'),
 				'context' => 'side',
-				'priority' => 'core',
+				'priority' => 'high',
 				'show_names' => false,
 			));
 
@@ -121,6 +126,15 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'attributes' => array(
 					'required' => true, // Will be required only if visible.
 				),
+				'date_format' => 'd/m/Y',
+				'column'	=> array(
+					'position'	=> 2,
+					'name'			=> 'Período de Vendas'
+				),
+				'data-daterange' => json_encode( array(
+					'buttontext' => 'Selecione o range',
+				) ),
+				'display_cb'	=> array(__CLASS__, 'display_periodo_column')
 			));
 
 			$valores = new_cmb2_box(array(
@@ -260,6 +274,33 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 
 			if ( $posts = $columns['description'] ){ unset($columns['description']); unset($columns['posts']); }
 			return $columns;
+		}
+
+		public function display_periodo_column($field_args, $field ) {
+			$data = $field->escaped_value();
+			?>
+	    <div class="custom-column-display <?php echo $field->row_classes(); ?>">
+	        <p><?php echo $data['start'] . ' - ' . $data['end']; ?></p>
+	        <p class="description"><?php echo $field->args( 'description' ); ?></p>
+	    </div>
+	    <?php
+		}
+
+		public function display_data_column($field_args, $field ) {
+			$datas = $field->value;
+			$post_id = $field->object_id;
+			?>
+	    <div class="custom-column-display <?php echo $field->row_classes(); ?>">
+	        <p><?php
+							foreach((array) $datas as $data){
+								$d = date('d/m/Y', $data['data']);
+								$tipo = get_term_by('slug', $data['tipo'], 'tipo-dia');
+								echo sprintf('%s - %s </br>', $d, $tipo->name );
+							}
+					  ?></p>
+	        <p class="description"><?php echo $field->args( 'description' ); ?></p>
+	    </div>
+	    <?php
 		}
 
 		public function vhr_limit_group_repeat( $post_id, $cmb ) {
