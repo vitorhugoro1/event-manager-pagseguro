@@ -2,8 +2,10 @@
 
 class VHR_Ingresso_Functions
 {
-  public function init(){
-    add_action( 'admin_init', array(__CLASS__, 'vhr_infos_box') );
+  public function __construct(){
+    add_action( 'admin_init', array($this, 'vhr_infos_box') );
+    add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
+    add_action('admin_post_nopriv_add_ingresso_item', array($this, 'add_ingresso_item'));
   }
 
   public function vhr_infos_box(){
@@ -13,6 +15,10 @@ class VHR_Ingresso_Functions
       add_meta_box( 'ingresso_info_box', 'Informações', array('VHR_Ingresso_Functions', 'vhr_infos_box_build'), 'ingresso', 'normal', 'default' );
       add_meta_box( 'vhr_ingresso_selector_box', 'Itens do Pedido', array('VHR_Ingresso_Functions', 'vhr_ingresso_selector_box'), 'ingresso', 'normal', 'default' );
       }
+  }
+
+  public function ingresso_meta_box(){
+
   }
 
   public function vhr_infos_box_build(){
@@ -49,8 +55,7 @@ class VHR_Ingresso_Functions
               </label>
             </th>
             <td>
-              <?php // echo get_the_title(get_post_meta( get_the_id(), 'evento', true )); ?>
-              <?php echo get_the_title(75); ?>
+              <?php echo get_the_title(get_post_meta( get_the_id(), 'evento_id', true )); ?>
             </td>
           </tr>
           <tr>
@@ -60,7 +65,7 @@ class VHR_Ingresso_Functions
               </label>
             </th>
             <td>
-              <input class="cliente-auto" type="text" name="cliente" value=""> - <a>Editar</a>
+              <?php echo get_the_author_meta('display_name', get_post_meta(get_the_id(), 'user_id', true)); ?>
             </td>
           </tr>
           <tr>
@@ -125,23 +130,9 @@ class VHR_Ingresso_Functions
           </thead>
           <tbody>
           <?php
-          $ingressos = array(
-            array(
-              "label" => "Dia Y",
-              "tipo"  => 1,
-              "qtd" => 2,
-              "valor" => 50.00
-            ),
-            array(
-              "label" => "Dia Z",
-              "tipo"  => 2,
-              "qtd" => 1,
-              "valor" => 100
-            ),
-          );
-
-          $total = 00.00;
-            // $ingressos = get_post_meta($post_id,'_vhr_ingressos_list', true);
+          $total = get_post_meta(get_the_id(), 'valor', true) ;
+            $ingressos = get_post_meta(get_the_id(),'ingressos', true);
+            $evento_id = get_post_meta( get_the_id(), 'evento_id', true );
 
             if(!empty($ingressos)){
 
@@ -153,7 +144,7 @@ class VHR_Ingresso_Functions
                     </td>
                     <td>
                       <input type="hidden" name="ingressos[<?php echo $k; ?>][tipo]" value="<?php echo $ingresso['tipo']; ?>">
-                      <?php echo $ingresso['label']; ?>
+                      <?php echo self::get_valor_label($evento_id, $ingresso['tipo']); ?>
                     </td>
                     <td>
                       <input type="hidden" name="ingressos[<?php echo $k; ?>][qtd]" value="<?php echo $ingresso['qtd']; ?>">
@@ -207,11 +198,8 @@ class VHR_Ingresso_Functions
                   <select class="widefat" id="tipo-ingresso">
                     <option value="">Selecione um tipo</option>
                     <?php
-                    $post_id = 75;
-                      // $evento_id = get_post_meta($post_id, 'evento', true);
-
-                      if($post_id):
-                        $tipos = get_post_meta($post_id, '_vhr_valores', true);
+                      if($evento_id):
+                        $tipos = get_post_meta($evento_id, '_vhr_valores', true);
 
                         foreach((array) $tipos as $tipo_id => $tipo):
                           ?>
@@ -222,6 +210,7 @@ class VHR_Ingresso_Functions
                       endif;
                     ?>
                   </select>
+                  <?php var_dump(get_post_meta($evento_id, '_vhr_valores', true)) ?>
                 </td>
               </tr>
               <tr>
@@ -244,6 +233,43 @@ class VHR_Ingresso_Functions
       </div>
     <?php
   }
+
+  function get_valor_label($post_id, $pos){
+    $label = "";
+    $valores = get_post_meta($post_id, '_vhr_valores', true);
+
+    $label .= $valores[ $pos ]['label'];
+
+    return $label;
+  }
+
+  public function add_ingresso_item(){
+    extract($_POST);
+
+    $postarr = array(
+      'post_type'   => 'ingresso',
+      'post_status' => 'publish',
+      'meta_input'  => array(
+        'evento_id' => $evento_id,
+        'user_id'   => $user_id,
+        'transaction_id'  => $transaction_id,
+        'transaction_state' => $transaction_state,
+        'notification_code' => $notification_code,
+        'ingressos' => $ingressos,
+        'valor' => $valor
+      )
+    );
+
+    $id = wp_insert_post( $postarr );
+
+    wp_update_post( array(
+      'ID'  => $id,
+      'post_title'  => '#'.$id,
+      'post_name'   => $id
+    ));
+
+    wp_die(json_encode( $id ));
+  }
 }
 
-VHR_Ingresso_Functions::init();
+new VHR_Ingresso_Functions;
