@@ -39,10 +39,10 @@ if(!class_exists('VHR_Loja_Post_Types')){
 				'menu_icon' => plugin_dir_url(__FILE__) . '/assets/img/event.png',
 				'rewrite' => array('slug' => 'eventos'),
 				'capability_type' => 'post',
-				'has_archive' => true,
+				'has_archive' => false,
 				'hierarchical' => false,
 				'menu_position' => null,
-				'supports' => array('title', 'thumbnail'),
+				'supports' => array('title', 'thumbnail', 'editor'),
 			);
 
 			register_post_type('eventos', $args);
