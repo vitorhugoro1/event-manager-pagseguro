@@ -119,6 +119,12 @@ class Http
      */
     private function curlConnection($method, $url, $timeout, $charset, array $data = null)
     {
+      if($_SERVER['SERVER_NAME'] == 'localhost'){
+            $proxy_port = "3128";
+            $proxy_ip   = "10.10.190.25";
+            $loginpassw = "p051262:Anine2601";
+        }
+
         if (strtoupper($method) === 'POST') {
             $postFields = ($data ? http_build_query($data, '', '&') : "");
             $contentLength = "Content-length: " . strlen($postFields);
@@ -158,13 +164,18 @@ class Http
                 sprintf('module-version: %s', Library::moduleVersion()->getRelease())
             );
         }
-        
+
         if (!is_null(Library::cmsVersion()->getRelease())) {
             array_push(
                 $options[CURLOPT_HTTPHEADER],
                 sprintf('cms-description: %s :%s', Library::cmsVersion()->getName(), Library::cmsVersion()->getRelease())
             );
         }
+
+        $options[CURLOPT_PROXYPORT]     = $proxy_port;
+        $options[CURLOPT_PROXYTYPE]     = 'HTTP';
+        $options[CURLOPT_PROXY]         = $proxy_ip;
+        $options[CURLOPT_PROXYUSERPWD]  = $loginpassw;
 
         $options = ($options + $methodOptions);
         $curl = curl_init();

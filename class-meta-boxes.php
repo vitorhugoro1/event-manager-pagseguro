@@ -278,12 +278,19 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 
 		public function display_periodo_column($field_args, $field ) {
 			$data = $field->escaped_value();
+			if(!empty($data)):
 			?>
 	    <div class="custom-column-display <?php echo $field->row_classes(); ?>">
 	        <p><?php echo $data['start'] . ' - ' . $data['end']; ?></p>
-	        <p class="description"><?php echo $field->args( 'description' ); ?></p>
 	    </div>
 	    <?php
+			else:
+			?>
+			<div class="custom-column-display <?php echo $field->row_classes(); ?>">
+					<p><i>Período não definido ou com erro</i></p>
+			</div>
+			<?php
+		 endif;
 		}
 
 		public function display_data_column($field_args, $field ) {
