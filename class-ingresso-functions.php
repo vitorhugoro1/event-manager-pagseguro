@@ -6,6 +6,7 @@ class VHR_Ingresso_Functions
     add_action( 'admin_init', array($this, 'vhr_infos_box') );
     add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_post_nopriv_add_ingresso_item', array($this, 'add_ingresso_item'));
+    add_action('admin_menu', array($this, 'disable_new_posts'));
   }
 
   public function vhr_infos_box(){
@@ -269,6 +270,21 @@ class VHR_Ingresso_Functions
     ));
 
     wp_die(json_encode( $id ));
+  }
+
+  function disable_new_posts() {
+  // Hide sidebar link
+  global $submenu;
+  unset($submenu['edit.php?post_type=ingresso'][10]);
+
+    // Hide link on listing page
+    if (isset($_GET['post_type']) && $_GET['post_type'] == 'ingresso' ||
+    isset($_GET['post']) && get_post_type($_GET['post']) == 'ingresso' ) {
+        echo '<style type="text/css">
+        #favorite-actions, .add-new-h2, .tablenav, .page-title-action { display:none; }
+        </style>';
+        echo '<script>jQuery(".page-title-action").remove();</script>';
+    }
   }
 }
 
