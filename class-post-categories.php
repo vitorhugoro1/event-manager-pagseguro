@@ -6,6 +6,7 @@ class VHR_Post_Categories
     {
         add_action('init', array($this, 'register_post_category_eventos'));
         add_action('save_post_eventos', array($this, 'save_evento_action'));
+        add_action('delete_post_eventos', array($this, 'action_remove_evento'));
         add_action('save_post', array($this, 'save_meta_box_evento'));
         add_action('add_meta_boxes', array($this, 'meta_boxes'));
     }
@@ -105,6 +106,15 @@ class VHR_Post_Categories
 
       if(is_wp_error($term)){
         return new WP_Error( 'error', "Erro ao tentar salvar a categoria de eventos" );
+      }
+    }
+
+    public function action_remove_evento($post_id){
+      $slug = sanitize_title( get_the_title( $post_id ) );
+      $term = get_term_by( 'slug', $slug, 'evento' );
+
+      if($term){
+        wp_delete_term( $term->term_id, 'evento' );
       }
     }
 }
