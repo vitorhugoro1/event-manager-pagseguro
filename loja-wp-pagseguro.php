@@ -15,6 +15,7 @@ require LOJA_ROOT . 'pagseguro/vendor/autoload.php';
 require LOJA_ROOT . 'class-pagseguro-config.php';
 require LOJA_ASSETS . 'load-assets.php';
 require LOJA_ROOT . 'cmb2/init.php';
+require LOJA_ROOT . 'class-pager-template.php';
 require LOJA_ROOT . 'vhr-functions.php';
 require LOJA_ROOT . 'cmb2-conditionals/cmb2-conditionals.php';
 require LOJA_ROOT . 'cmb2-date-range/wds-cmb2-date-range-field.php';
