@@ -2,8 +2,19 @@
 
 class VHR_Ingresso_Functions
 {
+  protected $estados = array(
+    1 => 'Aguardando pagamento',
+    2 => 'Em análise',
+    3 => 'Paga',
+    4 => 'Disponível',
+    5 => 'Em disputa',
+    6 => 'Devolvida',
+    7 => 'Cancelada'
+  );
+
   public function __construct(){
-    add_action( 'admin_init', array($this, 'vhr_infos_box') );
+    add_action('admin_init', array($this, 'vhr_infos_box') );
+    add_action('cmb2_admin_init', array($this, 'ingresso_meta_box'));
     add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_post_nopriv_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_menu', array($this, 'disable_new_posts'));
@@ -19,7 +30,64 @@ class VHR_Ingresso_Functions
   }
 
   public function ingresso_meta_box(){
+    $transaction = new_cmb2_box(array(
+      'id' => 'transaction_metabox',
+      'title' => 'Estado da transação',
+      'object_types' => array('ingresso'),
+      'context' => 'side',
+      'priority' => 'core',
+      'show_names' => false
+    ));
 
+    $transaction->add_field(array(
+      'name'  => 'Estado da transação',
+      'id'    => 'transaction_state',
+      'show_option_none'  => false,
+      'type'  => 'select',
+      'options' => $this->estados,
+      'column' => array(
+        'position'	=> 2,
+        'name'			=> 'Estado da transação'
+      )
+    ));
+
+    $valor = new_cmb2_box(array(
+      'id' => 'valor_metabox',
+      'title' => 'Valor da transação',
+      'object_types' => array('ingresso'),
+      'context' => 'side',
+      'priority' => 'core',
+      'show_names' => false
+    ));
+
+    $valor->add_field(array(
+      'id'    => 'valor',
+      'title'  => 'Valor da transação',
+      'type'    => 'text_money',
+      'attributes'  => array(
+        'readonly'  => 'readonly',
+        'disabled'  => 'disabled',
+        'type' => 'number',
+        'pattern' => '\d*',
+      ),
+      'before_field' => 'R$',
+      'column'  => array(
+        'position'  => 3,
+        'name'    => 'Valor da transação'
+      ),
+      'display_cb'  => array($this, 'show_column_valor')
+    ));
+  }
+
+  public function show_column_valor($field_args, $field ) {
+    $valor = $field->escaped_value();
+    $post_id = $field->object_id;
+    ?>
+    <div class="custom-column-display <?php echo $field->row_classes(); ?>">
+        <p>R$ <?php echo number_format($valor, 2, ',', ' '); ?></p>
+        <p class="description"><?php echo $field->args( 'description' ); ?></p>
+    </div>
+    <?php
   }
 
   public function vhr_infos_box_build(){
@@ -75,37 +143,6 @@ class VHR_Ingresso_Functions
             </th>
           </tr>
         </table>
-      </div>
-    <?php
-  }
-
-  public function vhr_transaction_state(){
-      global $post;
-      $estados = array(
-        '1' => 'Aguardando pagamento',
-        '2' => 'Em análise',
-        '3' => 'Paga',
-        '4' => 'Disponível',
-        '5' => 'Em disputa',
-        '6' => 'Devolvida',
-        '7' => 'Cancelada'
-      );
-
-      $transaction = get_post_meta($post->ID, 'transaction_state', true);
-
-      wp_nonce_field('transaction_state');
-    ?>
-      <div>
-          <label for="transaction_state">Estado da transação</label>
-          <select id="transaction_state" name="transaction_state">
-            <?php
-              foreach((array) $estados as $k => $s){
-                ?>
-                  <option value="<?php echo $k; ?>" <?php selected($transaction, $k) ?>><?php echo $s; ?></option>
-                <?php
-              }
-             ?>
-          </select>
       </div>
     <?php
   }

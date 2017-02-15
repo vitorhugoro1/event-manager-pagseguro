@@ -15,24 +15,6 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 
 		public function vhr_metaboxes_cmb2()
 		{
-			/*
-		 * Descrição do Evento
-		 */
-
-			$descricao = new_cmb2_box(array(
-				'id' => 'descricao_metabox',
-				'title' => 'Breve descrição sobre o evento',
-				'object_types' => array('eventos'),
-				'context' => 'normal',
-				'priority' => 'high',
-				'show_names' => false,
-			));
-
-			$descricao->add_field(array(
-				'id' => self::$prefix.'desc',
-				'title' => 'Breve descrição sobre o evento',
-				'type' => 'wysiwyg',
-			));
 
 			/*
 			 * Mapa de mesas
