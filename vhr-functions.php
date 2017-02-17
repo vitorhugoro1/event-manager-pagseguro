@@ -71,8 +71,15 @@ function register_new_page($new_page_title, $new_page_content, $new_page_templat
 function filter_content($content){
   global $post;
 
-  if('eventos' == get_post_type($post)){
+  if('eventos' == get_post_type($post) && ! is_single($post)){
     $valores = get_post_meta( $post->ID, '_vhr_valores', true );
+    $datas = get_post_meta( $post->ID, '_vhr_periodo', true );
+    $inicio = DateTime::createFromFormat('d/m/Y', $datas['start']);
+    $fim = DateTime::createFromFormat('d/m/Y', $datas['end']);
+    $hoje = new DateTime();
+    $comprarID = get_page_by_title('Selecionar Ingresso');
+    $link = get_the_permalink($comprarID->ID);
+
     ob_start();
       echo '<ul>';
         foreach ($valores as $val) {
@@ -85,6 +92,27 @@ function filter_content($content){
           echo sprintf('<li>%s ( %s ) - R$ %s</li>', $val['label'], $dia, $val['valor']);
         }
       echo '</ul>';
+
+      if($hoje > $inicio && $hoje < $fim){
+        echo sprintf('<a href="%s?refID=%d" class="tickera_button">Comprar</a>', $link, $post->ID);
+      }
+
+    $content .= ob_get_clean();
+  }
+
+  return $content;
+}
+
+function add_table_ingresso($content){
+  global $post;
+
+  if(is_page( 'selecionar-ingresso' )){
+    ob_start();
+    echo '<table>';
+      echo '<tbody>';
+      echo '</tbody>';
+    echo '</table>';
+
     $content .= ob_get_clean();
   }
 
@@ -92,3 +120,4 @@ function filter_content($content){
 }
 
 add_filter( 'the_content', 'filter_content' );
+add_filter( 'the_content', 'add_table_ingresso' );
