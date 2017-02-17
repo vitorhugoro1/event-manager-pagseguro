@@ -248,7 +248,6 @@ class VHR_Ingresso_Functions
                       endif;
                     ?>
                   </select>
-                  <?php var_dump(get_post_meta($evento_id, '_vhr_valores', true)) ?>
                 </td>
               </tr>
               <tr>

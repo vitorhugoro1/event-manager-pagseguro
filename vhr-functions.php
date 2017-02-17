@@ -67,3 +67,28 @@ function register_new_page($new_page_title, $new_page_content, $new_page_templat
 
     return $new_page_id;
 }
+
+function filter_content($content){
+  global $post;
+
+  if('eventos' == get_post_type($post)){
+    $valores = get_post_meta( $post->ID, '_vhr_valores', true );
+    ob_start();
+      echo '<ul>';
+        foreach ($valores as $val) {
+          $day = new VHR_Loja_Meta_Boxes();
+          if($val['multiplo']){
+            $dia = $day->get_day_event($post->ID, $val['dia-multiplo'], true);
+          } else {
+            $dia = $day->get_day_event($post->ID, $val['dia-simples']);
+          }
+          echo sprintf('<li>%s ( %s ) - R$ %s</li>', $val['label'], $dia, $val['valor']);
+        }
+      echo '</ul>';
+    $content .= ob_get_clean();
+  }
+
+  return $content;
+}
+
+add_filter( 'the_content', 'filter_content' );

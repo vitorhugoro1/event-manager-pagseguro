@@ -327,6 +327,23 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 			</script>
 			<?php
 		}
+
+	public function get_day_event($post_id, $key, $multi = false){
+		$days = get_post_meta( $post_id, '_vhr_data', true );
+		$dates = '';
+
+		if(!$multi){
+			$d = date('d/m/Y', $days[$key]['data']);
+			$dates .= $d;
+		} else {
+			foreach($key as $k => $v){
+				$d = date('d/m/Y', $days[$v]['data']);
+				$dates .= $d . (( isset ($key[$k+1]) ) ? ', ' : '');
+			}
+		}
+
+		return $dates;
+	}
 	}
 }
 
