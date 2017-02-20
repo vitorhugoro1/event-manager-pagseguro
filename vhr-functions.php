@@ -71,7 +71,8 @@ function register_new_page($new_page_title, $new_page_content, $new_page_templat
 function filter_content($content){
   global $post;
 
-  if('eventos' == get_post_type($post) && ! is_single($post)){
+  if('eventos' == get_post_type($post) && ! is_single($post) ||
+  'eventos' == get_post_type($post) && is_single()){
     $valores = get_post_meta( $post->ID, '_vhr_valores', true );
     $datas = get_post_meta( $post->ID, '_vhr_periodo', true );
     $inicio = DateTime::createFromFormat('d/m/Y', $datas['start']);
@@ -180,5 +181,20 @@ function add_table_ingresso($content){
   return $content;
 }
 
+function add_finalizar($content){
+  global $post;
+
+  if(is_page('confirmacao-pagamento')){
+    ob_start();
+    ?>
+    <?php
+    var_dump($_POST);
+    $content .= ob_get_flush();
+  }
+
+  return $content;
+}
+
 add_filter( 'the_content', 'filter_content' );
 add_filter( 'the_content', 'add_table_ingresso' );
+add_filter( 'the_content', 'add_finalizar' );
