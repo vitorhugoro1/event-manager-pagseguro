@@ -108,11 +108,72 @@ function add_table_ingresso($content){
 
   if(is_page( 'selecionar-ingresso' )){
     ob_start();
-    echo '<table>';
-      echo '<tbody>';
-      echo '</tbody>';
-    echo '</table>';
-
+    $refID = intval($_GET['refID']);
+    $valores = get_post_meta( $refID, '_vhr_valores', true );
+    ?>
+      <div class="om-columns">
+        <div class="om-column om-full">
+            Evento : <?php echo get_the_title( $refID ); ?>
+        </div>
+        <div class="om-column om-two-third">
+          <div class="select-ingresso">
+            <label for="tipo-ingresso">Selecione um ingresso</label>
+            <select id="tipo-ingresso">
+              <option value="">Selecione um ingresso</option>
+              <?php foreach((array) $valores as $k => $valor) : ?>
+                <option value="<?php echo $k; ?>"><?php echo $valor['label']; ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="qtd-ingresso">
+            <label for="qtd-ingresso">Quantidade de ingressos</label>
+            <input type="number" id="qtd-ingresso" min="1" value="1">
+          </div>
+        </div>
+        <div class="om-column om-one-third">
+          <input type="hidden" id="refID" value="<?php echo $refID; ?>">
+          <input type="hidden" id="action-url" value="<?php echo admin_url('admin-post.php'); ?>">
+          <button id="adc-ingresso">Adicionar</button>
+        </div>
+      </div>
+      <div class="vc_om-table selecionar-table">
+        <form action="<?php echo home_url('/confirmacao-pagamento'); ?>" method="post">
+          <table id="table-form">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox">
+                </th>
+                <th>
+                  Tipo ingresso
+                </th>
+                <th>
+                  Quantidade
+                </th>
+                <th>
+                  Valor
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="3">
+                  <span class="alignright" style="margin:0;">Total</span>
+                </th>
+                <th>
+                  <input type="hidden" name="valor" id="total" value="00.00">
+                  <span id="total-span">00,00</span>
+                </th>
+              </tr>
+            </tfoot>
+          </table>
+          <a href="javascript:void(0);">Remover</a>
+          <button type="submit">Continuar</button>
+        </form>
+      </div>
+    <?php
     $content .= ob_get_clean();
   }
 

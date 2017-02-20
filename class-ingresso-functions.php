@@ -17,6 +17,8 @@ class VHR_Ingresso_Functions
     add_action('cmb2_admin_init', array($this, 'ingresso_meta_box'));
     add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_post_nopriv_add_ingresso_item', array($this, 'add_ingresso_item'));
+    add_action('admin_post_validation_ingresso', array($this, 'validation_ingresso'));
+    add_action('admin_post_nopriv_validation_ingresso', array($this, 'validation_ingresso'));
     add_action('admin_menu', array($this, 'disable_new_posts'));
   }
 
@@ -321,6 +323,35 @@ class VHR_Ingresso_Functions
         </style>';
         echo '<script>jQuery(".page-title-action").remove();</script>';
     }
+  }
+
+  public function validation_ingresso(){
+    extract($_POST);
+
+    $valid = array(
+      'code'    => 0,
+      'return'  => ''
+    );
+
+    $valores = get_post_meta( $refID, '_vhr_valores', true );
+
+    $valor = $valores[$id]['valor'];
+    $label = $valores[$id]['label'];
+    $tValor = floatval($valor) * intval($qtd);
+
+    if($valores) {
+      $valid['code'] = 1;
+      $valid['return'] = array(
+        'tipo'  => intval($id),
+        'label' => $label,
+        'qtd'   => intval($qtd),
+        'valor' => floatval($tValor)
+      );
+    } else {
+      $valid['return'] = 'erro algum campo errado';
+    }
+    header('Content-Type: application/json');
+    wp_send_json($valid);
   }
 }
 

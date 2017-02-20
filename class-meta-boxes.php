@@ -88,7 +88,7 @@ if(!class_exists('VHR_Loja_Meta_Boxes')){
 				'id' => 'tipo',
 				'type' => 'select',
 				'show_option_none' => false,
-				'default' => 'expo',
+				'default' => 'exposicao',
 				'options' => array(__CLASS__, 'vhr_load_tipo_dia_values'),
 			));
 

@@ -1,7 +1,7 @@
 <?php
 
 function vhr_load_assets(){
-  global $post_type, $post_ID;
+  global $post_type, $post_ID, $post;
 
     wp_register_style( 'select2css', plugin_dir_url( __FILE__ ) . 'css/select2.min.css', false, '1.0', 'all' );
     wp_register_script( 'select2', plugin_dir_url( __FILE__ ) . 'js/select2.full.min.js', array( 'jquery' ), '1.0', true );
@@ -14,3 +14,11 @@ function vhr_load_assets(){
 }
 
 add_action( 'admin_enqueue_scripts', 'vhr_load_assets' );
+
+add_action( 'wp_enqueue_scripts', 'load_assets_front' );
+
+function load_assets_front(){
+  if(is_page( 'selecionar-ingresso' )){
+    wp_enqueue_script('front-validations', plugin_dir_url( __FILE__ ) . 'js/front-validations.js', array( 'jquery' ), '1.0');
+  }
+}
