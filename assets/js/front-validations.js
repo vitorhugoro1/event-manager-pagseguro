@@ -32,6 +32,12 @@ jQuery(document).ready(function($) {
         qtd: qtd
       },
       type: "jsonp",
+      beforeSend: function(){
+        var $closing=jQuery('<div class="om-closing"></div>');
+					jQuery('body').append($closing);
+					$closing.fadeTo(400, .8);
+        jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index','100001').fadeIn(200);
+      },
       complete: function(data){
         data = data.responseJSON;
         var body = table.children("tbody");
@@ -39,22 +45,22 @@ jQuery(document).ready(function($) {
         var count = body.children("tr").length;
         var c = (count == 0) ? 0 : count + 1;
         var tr = '';
-
+        console.log(data);
         if(1 == data.code){
           tr += '<tr>';
           tr += '<td>';
           tr += '<input type="checkbox">';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" name="ingresso[' + c + '][tipo]" value="' + data.return.tipo + '">';
+          tr += '<input type="hidden" data-elem="tipo" name="ingresso[' + c + '][tipo]" value="' + data.return.tipo + '">';
           tr += '<span>' + data.return.label + '</span>';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" name="ingresso[' + c + '][qtd]" value="' + data.return.qtd + '">';
+          tr += '<input type="hidden" data-elem="qtd" name="ingresso[' + c + '][qtd]" value="' + data.return.qtd + '">';
           tr += '<span>' + data.return.qtd + '</span>';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" name="ingresso[' + c + '][valor]" value="' + data.return.valor + '">';
+          tr += '<input type="hidden" data-elem="valor" name="ingresso[' + c + '][valor]" value="' + data.return.valor + '">';
           tr += '<span>' + (data.return.valor).formatMoney(2, ',', '.') + '</span>';
           tr += '</td>';
           tr += '</tr>';
@@ -64,7 +70,27 @@ jQuery(document).ready(function($) {
           $("#total-span").html(nTotal.formatMoney(2, ',', '.'));
           body.append(tr);
         }
+
+        $("#qtd-ingresso").val(1);
+        $("#tipo-ingresso").val("");
+
+        jQuery('.om-closing').remove();
+  			jQuery('.om-loading-circle').remove();
       }
+    });
+  });
+
+  $("#rmv-ingresso").on('click', function(event) {
+    var table = $("#table-form");
+    var selectit = table.children('tbody').find('input:checked');
+
+    $.each(selectit, function(index, val) {
+      var idx = $(val).parents('tr').index();
+      var nxt = $(val).parents('tr').next().index();
+
+      console.log($(val).parents('tr').next().is(':not(:checked)').index());
+      console.log($(val).parents('tr').next().next().index());
+      console.log($(val).parents('tr').next().next().next().index());
     });
   });
 });

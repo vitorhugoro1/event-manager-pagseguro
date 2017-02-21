@@ -170,7 +170,7 @@ function add_table_ingresso($content){
               </tr>
             </tfoot>
           </table>
-          <a href="javascript:void(0);">Remover</a>
+          <a href="javascript:void(0);" id="rmv-ingresso">Remover</a>
           <button type="submit">Continuar</button>
         </form>
       </div>

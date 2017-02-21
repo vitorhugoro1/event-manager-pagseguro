@@ -23,6 +23,10 @@ class VHR_Loja_Build
 		array(
 			'name' => 'Selecionar Ingresso',
 			'template' => 'template/page-selecionar-ingresso.php'
+		),
+		array(
+			'name' => 'Cadastrar',
+			'template' => 'template/page-cadastrar.php'
 		)
 	);
 
