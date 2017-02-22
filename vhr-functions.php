@@ -94,7 +94,7 @@ function filter_content($content){
         }
       echo '</ul>';
 
-      if($hoje > $inicio && $hoje < $fim){
+      if(($hoje > $inicio || $hoje == $inicio) && $hoje < $fim){
         echo sprintf('<a href="%s?refID=%d" class="tickera_button">Comprar</a>', $link, $post->ID);
       }
 
@@ -246,7 +246,7 @@ function add_finalizar($content){
         <button type="submit">Finalizar</button>
       </form>
       <div id="test">
-        
+
       </div>
     </div>
     <?php
