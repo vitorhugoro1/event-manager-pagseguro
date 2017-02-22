@@ -52,15 +52,15 @@ jQuery(document).ready(function($) {
           tr += '<input type="checkbox">';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" data-elem="tipo" name="ingresso[' + c + '][tipo]" value="' + data.return.tipo + '">';
+          tr += '<input type="hidden" data-elem="tipo" name="ingressos[' + c + '][tipo]" value="' + data.return.tipo + '">';
           tr += '<span>' + data.return.label + '</span>';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" data-elem="qtd" name="ingresso[' + c + '][qtd]" value="' + data.return.qtd + '">';
+          tr += '<input type="hidden" data-elem="qtd" name="ingressos[' + c + '][qtd]" value="' + data.return.qtd + '">';
           tr += '<span>' + data.return.qtd + '</span>';
           tr += '</td>';
           tr += '<td>';
-          tr += '<input type="hidden" data-elem="valor" name="ingresso[' + c + '][valor]" value="' + data.return.valor + '">';
+          tr += '<input type="hidden" data-elem="valor" name="ingressos[' + c + '][valor]" value="' + data.return.valor + '">';
           tr += '<span>' + (data.return.valor).formatMoney(2, ',', '.') + '</span>';
           tr += '</td>';
           tr += '</tr>';

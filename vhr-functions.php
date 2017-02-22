@@ -139,6 +139,7 @@ function add_table_ingresso($content){
       </div>
       <div class="vc_om-table selecionar-table">
         <form action="<?php echo home_url('/confirmacao-pagamento'); ?>" method="post">
+          <input type="hidden" name="refID" value="<?php echo intval($refID); ?>">
           <table id="table-form">
             <thead>
               <tr>
@@ -185,11 +186,66 @@ function add_finalizar($content){
   global $post;
 
   if(is_page('confirmacao-pagamento')){
+    $pagseguro = new VHR_PagSeguro();
+    $pagseguro->add_pagseguro_init();
     ob_start();
+    extract($_POST);
+    $valores = get_post_meta( $refID, '_vhr_valores', true );
     ?>
+    <div class="vc_om-table selecionar-table">
+      <form method="post" id="finalize">
+        <?php wp_nonce_field('finalize'); ?>
+        <input type="hidden" name="refID" value="<?php echo intval($refID); ?>">
+        <table id="table-form">
+          <thead>
+            <tr>
+              <th>
+                Tipo ingresso
+              </th>
+              <th>
+                Quantidade
+              </th>
+              <th>
+                Valor
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($ingressos as $k => $ingresso) : ?>
+                <tr>
+                  <td>
+                    <input type="hidden" data-elem="tipo" name="ingressos[<?php echo $k ?>][tipo]" value="<?php echo $ingresso['tipo']; ?>">
+                    <?php echo $valores[$ingresso['tipo']]['label']; ?>
+                  </td>
+                  <td>
+                    <input type="hidden" data-elem="qtd" name="ingressos[<?php echo $k ?>][qtd]" value="<?php echo $ingresso['qtd']; ?>">
+                    <?php echo $ingresso['qtd'] ?>
+                  </td>
+                  <td>
+                    <input type="hidden" data-elem="valor" name="ingressos[<?php echo $k ?>][valor]" value="<?php echo floatval($ingresso['valor']); ?>">
+                    <?php echo number_format(floatval($ingresso['valor']), 2, ',', '.');?>
+                  </td>
+                </tr>
+            <?php endforeach; ?>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="2">
+                <span class="alignright" style="margin:0;">Total</span>
+              </th>
+              <th>
+                <input type="hidden" name="valor" id="total" value="<?php echo floatval($valor); ?>">
+                <span id="total-span"><?php echo number_format(floatval($valor), 2, ',', '.'); ?></span>
+              </th>
+            </tr>
+          </tfoot>
+        </table>
+        <a href="javascript:window.history.back();">Cancelar</a>
+        <button type="submit">Finalizar</button>
+      </form>
+    </div>
     <?php
-    var_dump($_POST);
-    $content .= ob_get_flush();
+    $content .= ob_get_clean();
   }
 
   return $content;
