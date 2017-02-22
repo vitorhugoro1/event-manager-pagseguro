@@ -68,8 +68,8 @@ class VHR_Ingresso_Functions
       'attributes'  => array(
         'readonly'  => 'readonly',
         'disabled'  => 'disabled',
-        'type' => 'number',
-        'pattern' => '\d*',
+        // 'type' => 'number',
+        // 'pattern' => '\d*',
       ),
       'before_field' => 'R$',
       'column'  => array(
@@ -77,6 +77,29 @@ class VHR_Ingresso_Functions
         'name'    => 'Valor da transação'
       ),
       'display_cb'  => array($this, 'show_column_valor')
+    ));
+
+    $status = new_cmb2_box(array(
+      'id' => 'status_metabox',
+      'title' => 'Status da transação',
+      'object_types' => array('ingresso'),
+      'context' => 'side',
+      'priority' => 'core',
+      'show_names' => false
+    ));
+
+    $status->add_field(array(
+      'id'    => 'status',
+      'title'  => 'Status da transação',
+      'type'    => 'select',
+      'options' => array(
+        'ativo' => 'Ativo',
+        'cancelado' => 'Cancelado'
+      ),
+      'column'  => array(
+        'position'  => 4,
+        'name'    => 'Status da transação'
+      ),
     ));
   }
 
@@ -429,6 +452,7 @@ class VHR_Ingresso_Functions
       'meta_input'  => array(
         'evento_id' => $args['evento_id'],
         'user_id'   => $args['user_id'],
+        'transaction_state' => 1,
         'ingressos' => $args['ingressos'],
         'valor'     => $args['valor']
       )

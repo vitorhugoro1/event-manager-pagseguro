@@ -104,8 +104,19 @@ jQuery(document).ready(function($) {
     success: function(data){
       jQuery('.om-closing').remove();
       jQuery('.om-loading-circle').remove();
-      
-      PagSeguroLightbox(data.code);
+
+      PagSeguroLightbox({
+        code: data.code
+        },{
+            success: function(transactionCode){
+              /**
+               * Criar função para guardar o transactionCode do ingresso,
+               * retornar o orderID juntamente com o code
+               */
+              alert("success - " + transactionCode);
+            }
+        }
+      );
     }
   });
 });
