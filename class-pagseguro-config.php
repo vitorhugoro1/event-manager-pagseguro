@@ -25,10 +25,10 @@ class VHR_PagSeguro
 
     if($sandbox == 1){
       \PagSeguro\Configuration\Configure::setEnvironment("sandbox");
-      $this->pagseguro_script_callback($sandbox);
+      // $this->pagseguro_script_callback($sandbox);
     } else {
       \PagSeguro\Configuration\Configure::setEnvironment('production');
-      $this->pagseguro_script_callback($sandbox);
+      // $this->pagseguro_script_callback($sandbox);
     }
 
     \PagSeguro\Configuration\Configure::setAccountCredentials($credentials['email'], $credentials['token']);
@@ -52,11 +52,6 @@ class VHR_PagSeguro
 
   }
 
-  public function generate_action(){
-    extract($_POST);
-
-
-  }
 }
 
 new VHR_PagSeguro();

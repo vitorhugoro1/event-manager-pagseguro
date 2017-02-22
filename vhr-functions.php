@@ -192,8 +192,10 @@ function add_finalizar($content){
     extract($_POST);
     $valores = get_post_meta( $refID, '_vhr_valores', true );
     ?>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
     <div class="vc_om-table selecionar-table">
-      <form method="post" id="finalize">
+      <form method="post" action="<?php echo admin_url('admin-post.php'); ?>" id="finalize">
+        <input type="hidden" name="action" value="pag_code_gen">
         <?php wp_nonce_field('finalize'); ?>
         <input type="hidden" name="refID" value="<?php echo intval($refID); ?>">
         <table id="table-form">
@@ -243,6 +245,9 @@ function add_finalizar($content){
         <a href="javascript:window.history.back();">Cancelar</a>
         <button type="submit">Finalizar</button>
       </form>
+      <div id="test">
+        
+      </div>
     </div>
     <?php
     $content .= ob_get_clean();

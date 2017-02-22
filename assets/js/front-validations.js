@@ -93,4 +93,19 @@ jQuery(document).ready(function($) {
       console.log($(val).parents('tr').next().next().next().index());
     });
   });
+
+  $("#finalize").ajaxForm({
+    beforeSubmit: function(arr, $form, options){
+      var $closing=jQuery('<div class="om-closing"></div>');
+        jQuery('body').append($closing);
+        $closing.fadeTo(400, .8);
+      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index','100001').fadeIn(200);
+    },
+    success: function(data){
+      jQuery('.om-closing').remove();
+      jQuery('.om-loading-circle').remove();
+      
+      PagSeguroLightbox(data.code);
+    }
+  });
 });

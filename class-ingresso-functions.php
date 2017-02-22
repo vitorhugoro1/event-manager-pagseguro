@@ -16,9 +16,8 @@ class VHR_Ingresso_Functions
     add_action('admin_init', array($this, 'vhr_infos_box') );
     add_action('cmb2_admin_init', array($this, 'ingresso_meta_box'));
     add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
-    add_action('admin_post_nopriv_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_post_validation_ingresso', array($this, 'validation_ingresso'));
-    add_action('admin_post_nopriv_validation_ingresso', array($this, 'validation_ingresso'));
+    add_action('admin_post_pag_code_gen', array($this, 'pag_code_gen'));
     add_action('admin_menu', array($this, 'disable_new_posts'));
   }
 
@@ -352,6 +351,159 @@ class VHR_Ingresso_Functions
     }
     header('Content-Type: application/json');
     wp_send_json($valid);
+  }
+
+  public function pag_code_gen(){
+    $data = array();
+
+    $nonce = $_POST['_wpnonce'];
+
+    if( ! wp_verify_nonce( $nonce, 'finalize' ) ){
+      return new WP_Error('valid nonce', "Validação errada");
+    }
+
+    $ingressos = $_POST['ingressos'];
+    $refID = $_POST['refID'];
+    $total = $_POST['valor'];
+    $user_id = get_current_user_id();
+
+    $args = array(
+      'evento_id' => $refID,
+      'user_id'   => $user_id,
+      'ingressos' => $ingressos,
+      'valor'     => number_format($total, 2)
+    );
+
+    $orderID = $this->insert_order($args);
+
+    $code = $this->pagseguro_init(array(
+      'ref'       => $this->pag_ref_gen($orderID),
+      'orderID'   => $orderID,
+      'user_id'   => $user_id,
+      'ingressos' => $ingressos
+    ));
+
+    $data['code'] = $code;
+
+    header('Content-Type: application/json');
+    wp_send_json($data);
+  }
+
+  /**
+   * Gera o CODIGO de referência para a transação do PagSeguro
+   * @param  int $id ID do ingresso
+   * @return str/object
+   */
+
+  protected function pag_ref_gen($id){
+    if( empty($id) ) {
+      return new WP_Error('format invalid', "Formato de informação invalído.");
+    }
+
+    $ref = 'PAGRF';
+    $ref .= date('Y');
+    $ref .= str_pad($id, 6, 0, STR_PAD_LEFT);
+
+    return $ref;
+  }
+
+  /**
+   * Insere um novo pedido (ingresso) na base de dados
+   * @param  array/string $args Argumentos aceitos
+   * @return mixed
+   */
+
+  protected function insert_order($args){
+    $defaults = array(
+      'evento_id' => 0,
+      'user_id'   => 0,
+      'ingressos' => array(),
+      'valor'     => 00.00
+    );
+
+    $args = wp_parse_args( $args, $defaults );
+
+    $postarr = array(
+      'post_type'   => 'ingresso',
+      'post_status' => 'publish',
+      'meta_input'  => array(
+        'evento_id' => $args['evento_id'],
+        'user_id'   => $args['user_id'],
+        'ingressos' => $args['ingressos'],
+        'valor'     => $args['valor']
+      )
+    );
+
+    $id = wp_insert_post( $postarr );
+
+    wp_update_post( array(
+      'ID'  => $id,
+      'post_title'  => '#'.$id,
+      'post_name'   => $id
+    ));
+
+    return $id;
+  }
+
+  protected function pagseguro_init($args){
+    $pagseguro = new VHR_PagSeguro();
+    $pagseguro->add_pagseguro_init();
+
+    $defaults = array(
+      'ref'       => '',
+      'orderID'   => 0,
+      'user_id'   => 0,
+      'ingressos' => array()
+    );
+
+    $args = wp_parse_args( $args, $defaults );
+
+    $payment = new \PagSeguro\Domains\Requests\Payment();
+
+    $valores = get_post_meta( $orderID, '_vhr_valores', true );
+    $home_url = home_url();
+    $notificacao = home_url('/notificacao');
+
+    foreach((array) $args['ingressos'] as $ingresso) {
+      $tipo = intval($ingresso['tipo']);
+      $description = ($valores[$tipo]['label']) ? $valores[$tipo]['label'] : 'Ingresso ' . $tipo;
+      $valorSimples = (intval($ingresso['qtd']) == 1) ? number_format(floatval($ingresso['valor']), 2) : number_format(floatval($valores[$tipo]['valor']), 2);
+
+      $payment->addItems()->withParameters(
+        $ingresso['tipo'],
+        $description,
+        intval($ingresso['qtd']),
+        $valorSimples
+      );
+    }
+
+    $payment->setCurrency("BRL");
+    $payment->setReference($args['ref']);
+
+    // Set your customer information.
+    $payment->setSender()->setName(get_the_author_meta('display_name'));
+    $payment->setSender()->setEmail(get_the_author_meta('user_email'));
+    $payment->setSender()->setPhone()->withParameters(
+        11,
+        56273440
+    );
+
+    $payment->addParameter('shippingAddressRequired', 'false');
+
+    $payment->setRedirectUrl($home_url);
+    $payment->setNotificationUrl($notificacao);
+
+    try {
+        $onlyCheckoutCode = true;
+        $result = $payment->register(
+            \PagSeguro\Configuration\Configure::getAccountCredentials(),
+            $onlyCheckoutCode
+        );
+
+        return $result->getCode();
+    } catch (Exception $e) {
+        return array('msg' => $e->getMessage(), 'exc' => true);
+    }
   }
 }
 
