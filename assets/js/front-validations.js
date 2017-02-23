@@ -1,24 +1,24 @@
-Number.prototype.formatMoney = function(c, d, t){
-var n = this,
+Number.prototype.formatMoney = function(c, d, t) {
+  var n = this,
     c = isNaN(c = Math.abs(c)) ? 2 : c,
     d = d == undefined ? "." : d,
     t = t == undefined ? "," : t,
     s = n < 0 ? "-" : "",
     i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
     j = (j = i.length) > 3 ? j % 3 : 0;
-   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
- };
+  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};
 
 
 jQuery(document).ready(function($) {
-  $("#adc-ingresso").on('click', function(){
+  $("#adc-ingresso").on('click', function() {
     var refID = $("#refID").val();
     var qtd = $("#qtd-ingresso").val();
     var tipo = $("#tipo-ingresso").val();
     var url = $("#action-url").val();
     var table = $("#table-form");
 
-    if(qtd == "" || tipo == ""){
+    if (qtd == "" || tipo == "") {
       alert("Preencha todos os campos");
       return false;
     }
@@ -32,13 +32,13 @@ jQuery(document).ready(function($) {
         qtd: qtd
       },
       type: "jsonp",
-      beforeSend: function(){
-        var $closing=jQuery('<div class="om-closing"></div>');
-					jQuery('body').append($closing);
-					$closing.fadeTo(400, .8);
-        jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index','100001').fadeIn(200);
+      beforeSend: function() {
+        var $closing = jQuery('<div class="om-closing"></div>');
+        jQuery('body').append($closing);
+        $closing.fadeTo(400, .8);
+        jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
       },
-      complete: function(data){
+      complete: function(data) {
         data = data.responseJSON;
         var body = table.children("tbody");
         var total = $("#total").val();
@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
         var c = (count == 0) ? 0 : count + 1;
         var tr = '';
         console.log(data);
-        if(1 == data.code){
+        if (1 == data.code) {
           tr += '<tr>';
           tr += '<td>';
           tr += '<input type="checkbox">';
@@ -75,7 +75,7 @@ jQuery(document).ready(function($) {
         $("#tipo-ingresso").val("");
 
         jQuery('.om-closing').remove();
-  			jQuery('.om-loading-circle').remove();
+        jQuery('.om-loading-circle').remove();
       }
     });
   });
@@ -95,28 +95,53 @@ jQuery(document).ready(function($) {
   });
 
   $("#finalize").ajaxForm({
-    beforeSubmit: function(arr, $form, options){
-      var $closing=jQuery('<div class="om-closing"></div>');
-        jQuery('body').append($closing);
-        $closing.fadeTo(400, .8);
-      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index','100001').fadeIn(200);
+    beforeSubmit: function(arr, $form, options) {
+      var $closing = jQuery('<div class="om-closing"></div>');
+      jQuery('body').append($closing);
+      $closing.fadeTo(400, .8);
+      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
     },
-    success: function(data){
+    success: function(data) {
       jQuery('.om-closing').remove();
       jQuery('.om-loading-circle').remove();
 
       PagSeguroLightbox({
         code: data.code
-        },{
-            success: function(transactionCode){
-              /**
-               * Criar função para guardar o transactionCode do ingresso,
-               * retornar o orderID juntamente com o code
-               */
-              alert("success - " + transactionCode);
-            }
+      }, {
+        success: function(transactionCode) {
+          var $closing = jQuery('<div class="om-closing"></div>');
+          jQuery('body').append($closing);
+          $closing.fadeTo(400, .8);
+          jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+
+          $.post($('#finalize').attr('action'), {
+            action: 'add_notification_code',
+            orderID: data.orderID,
+            transactionCode: transactionCode
+          }, function(data) {
+            console.log(data);
+          });
+
+          jQuery('.om-closing').remove();
+          jQuery('.om-loading-circle').remove();
+        },
+        abort: function() {
+          var $closing = jQuery('<div class="om-closing"></div>');
+          jQuery('body').append($closing);
+          $closing.fadeTo(400, .8);
+          jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+
+          $.post($('#finalize').attr('action'), {
+            action: 'add_abort_status',
+            orderID: data.orderID
+          }, function(data) {
+            console.log(data);
+          });
+
+          jQuery('.om-closing').remove();
+          jQuery('.om-loading-circle').remove();
         }
-      );
+      });
     }
   });
 });

@@ -18,7 +18,10 @@ class VHR_Ingresso_Functions
     add_action('admin_post_add_ingresso_item', array($this, 'add_ingresso_item'));
     add_action('admin_post_validation_ingresso', array($this, 'validation_ingresso'));
     add_action('admin_post_pag_code_gen', array($this, 'pag_code_gen'));
+    add_action('admin_post_add_notification_code', array($this, 'add_notification_code'));
+    add_action('admin_post_add_abort_status', array($this, 'add_abort_status'));
     add_action('admin_menu', array($this, 'disable_new_posts'));
+    add_action('admin_footer', array($this, 'disable_new_posts_js'));
   }
 
   public function vhr_infos_box(){
@@ -163,8 +166,11 @@ class VHR_Ingresso_Functions
           </tr>
           <tr>
             <th>
-              <label for="transaction_id"></label>
+              <label for="notification_code">Código de Transação</label>
             </th>
+            <td>
+              <?php echo get_post_meta( get_the_id(), 'notification_code', true ); ?>
+            </td>
           </tr>
         </table>
       </div>
@@ -257,7 +263,7 @@ class VHR_Ingresso_Functions
                   Tipo
                 </th>
                 <td>
-                  <select class="widefat" id="tipo-ingresso">
+                  <select id="tipo-ingresso">
                     <option value="">Selecione um tipo</option>
                     <?php
                       if($evento_id):
@@ -292,6 +298,11 @@ class VHR_Ingresso_Functions
         </div>
         <div class="clear"></div>
       </div>
+      <style media="screen">
+        span.select2-container.select2-container--default.select2-container--open {
+          z-index: 10000000;
+        }
+      </style>
     <?php
   }
 
@@ -333,15 +344,17 @@ class VHR_Ingresso_Functions
   }
 
   function disable_new_posts() {
-  // Hide sidebar link
-  global $submenu;
-  unset($submenu['edit.php?post_type=ingresso'][10]);
+    // Hide sidebar link
+    global $submenu;
+    unset($submenu['edit.php?post_type=ingresso'][10]);
+  }
 
+  function disable_new_posts_js(){
     // Hide link on listing page
     if (isset($_GET['post_type']) && $_GET['post_type'] == 'ingresso' ||
     isset($_GET['post']) && get_post_type($_GET['post']) == 'ingresso' ) {
         echo '<style type="text/css">
-        #favorite-actions, .add-new-h2, .tablenav, .page-title-action { display:none; }
+        #favorite-actions, .add-new-h2, .page-title-action { display:none; }
         </style>';
         echo '<script>jQuery(".page-title-action").remove();</script>';
     }
@@ -406,10 +419,69 @@ class VHR_Ingresso_Functions
       'ingressos' => $ingressos
     ));
 
-    $data['code'] = $code;
+    if( ! is_array($code) ){
+      $data['code'] = $code;
+      $data['orderID'] = $orderID;
+    } else {
+      $data = $code;
+    }
 
     header('Content-Type: application/json');
     wp_send_json($data);
+  }
+
+  public function add_notification_code(){
+    header('Content-Type: application/json');
+    $data = array();
+    $pagseguro = new VHR_PagSeguro();
+    $pagseguro->add_pagseguro_init();
+
+    if(! isset($_POST['orderID']) ){
+      $data = new WP_Error('parametro invalido', 'Paramêtros invalidos.');
+      return wp_send_json_error($data);
+    }
+
+    $response = \PagSeguro\Services\Transactions\Search\Code::search(
+      \PagSeguro\Configuration\Configure::getAccountCredentials(),
+      $_POST['transactionCode']
+    );
+
+    $post_id = update_post_meta( $_POST['orderID'], 'notification_code', $_POST['transactionCode'] );
+
+    $status = $response->getStatus();
+
+    if($status != 1){
+      update_post_meta( $_POST['orderID'], 'transaction_state', $status);
+
+      if($status == 7){
+        update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
+      }
+    }
+
+    if(is_wp_error( $post_id )){
+      $errors = $post_id->get_error_messages();
+      $data['error'] = implode($errors, ',');
+      wp_send_json_error( $data );
+    } else {
+      $data['success'] = true;
+      $data['id'] = $post_id;
+      wp_send_json_success($data);
+    }
+  }
+
+  public function add_abort_status(){
+    header('Content-Type: application/json');
+    $data = array();
+
+    if(! isset($_POST['orderID']) ){
+      $data = new WP_Error('parametro invalido', 'Paramêtros invalidos.');
+      return wp_send_json_error($data);
+    }
+
+    update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
+    update_post_meta( $_POST['orderID'], 'transaction_state', 7 );
+
+    wp_send_json_success($_POST['orderID']);
   }
 
   /**
@@ -454,7 +526,8 @@ class VHR_Ingresso_Functions
         'user_id'   => $args['user_id'],
         'transaction_state' => 1,
         'ingressos' => $args['ingressos'],
-        'valor'     => $args['valor']
+        'valor'     => $args['valor'],
+        'status'    => 'ativo'
       )
     );
 
@@ -463,7 +536,10 @@ class VHR_Ingresso_Functions
     wp_update_post( array(
       'ID'  => $id,
       'post_title'  => '#'.$id,
-      'post_name'   => $id
+      'post_name'   => $id,
+      'meta_input'  => array(
+        'transaction_id'  => $this->pag_ref_gen($id)
+      )
     ));
 
     return $id;
@@ -512,8 +588,9 @@ class VHR_Ingresso_Functions
         56273440
     );
 
-    $payment->addParameter('shippingAddressRequired', 'false');
+    // $payment->addParameter()->withParameter('shippingAddressRequired', 'false');
 
+    $payment->setPaymentMethod(array(\PagSeguro\Enum\PaymentMethod\Group::CREDIT_CARD));
     $payment->setRedirectUrl($home_url);
     $payment->setNotificationUrl($notificacao);
 

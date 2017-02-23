@@ -1,4 +1,7 @@
 <?php
+if( ! isset($_GET['refID']) ){
+	header('Location:' . home_url('/eventos'));
+}
 $page_slider=eventerra_get_page_slider($post->ID);
 eventerra_custom_sidebar_setup($post->ID);
 eventerra_wpb_detect($post);

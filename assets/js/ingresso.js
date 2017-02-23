@@ -57,7 +57,7 @@ function addIngresso(){
               '<input type="checkbox" data-id="remover" value="' + 0  + '">' +
             '</td>';
     $add += '<td><input type="hidden" name="ingressos[' + 0  + '][tipo]" value="' + $tipo  + '">' +
-              'Ingresso ' + (parseInt($tipo) + 1)  +
+              jQuery("#tipo-ingresso option:selected").text()  +
             '</td>' +
             '<td><input type="hidden" name="ingressos[' + 0  + '][qtd]" value="' + $qtd  + '">' +
               $qtd +
