@@ -20,6 +20,7 @@ require LOJA_ROOT . 'vhr-functions.php';
 require LOJA_ROOT . 'cmb2-conditionals/cmb2-conditionals.php';
 require LOJA_ROOT . 'cmb2-date-range/wds-cmb2-date-range-field.php';
 require LOJA_ROOT . 'class-post-types.php';
+require LOJA_ROOT . 'class-user.php';
 require LOJA_ROOT . 'class-post-categories.php';
 require LOJA_ROOT . 'class-meta-boxes.php';
 require LOJA_ROOT . 'class-ingresso-functions.php';

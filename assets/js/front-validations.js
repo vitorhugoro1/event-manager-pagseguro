@@ -11,6 +11,12 @@ Number.prototype.formatMoney = function(c, d, t) {
 
 
 jQuery(document).ready(function($) {
+
+  /**
+   * Adiciona um ingresso na lista de compra
+   * @type {[type]}
+   */
+
   $("#adc-ingresso").on('click', function() {
     var refID = $("#refID").val();
     var qtd = $("#qtd-ingresso").val();
@@ -80,6 +86,11 @@ jQuery(document).ready(function($) {
     });
   });
 
+  /**
+   * Remove um ingresso da lista de compra
+   * @type {[type]}
+   */
+
   $("#rmv-ingresso").on('click', function(event) {
     var table = $("#table-form");
     var selectit = table.children('tbody').find('input:checked');
@@ -93,6 +104,11 @@ jQuery(document).ready(function($) {
       console.log($(val).parents('tr').next().next().next().index());
     });
   });
+
+  /**
+   * Finaliza a compra dos ingressos
+   * @type {[type]}
+   */
 
   $("#finalize").ajaxForm({
     beforeSubmit: function(arr, $form, options) {
@@ -145,5 +161,57 @@ jQuery(document).ready(function($) {
         }
       });
     }
+  });
+
+  /**
+   * Atualiza o perfil do usuario
+   * @type {[type]}
+   */
+
+  $('#update_perfil').ajaxForm({
+    beforeSubmit: function(arr, $form, options) {
+      var $closing = jQuery('<div class="om-closing"></div>');
+      jQuery('body').append($closing);
+      $closing.fadeTo(400, .8);
+      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+    },
+    success: function(data) {
+      jQuery('.om-closing').remove();
+      jQuery('.om-loading-circle').remove();
+
+      if (data.success) {
+        $("span[data-id='name']").text(data.data.name);
+        $("span[data-id='email']").text(data.data.email);
+        $("span[data-id='tel']").text(data.data.tel);
+      }
+    }
+  });
+
+  /**
+   * Cria a paginação da tabela de ingressos
+   * @type {Number}
+   */
+
+  $('table.paginated').each(function() {
+    var currentPage = 0;
+    var numPerPage = 7;
+    var $table = $(this);
+    $table.bind('repaginate', function() {
+      $table.find('tbody tr').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+    });
+    $table.trigger('repaginate');
+    var numRows = $table.find('tbody tr').length;
+    var numPages = Math.ceil(numRows / numPerPage);
+    var $pager = $('<div class="pager"></div>');
+    for (var page = 0; page < numPages; page++) {
+      $('<span class="page-number"></span>').text(page + 1).bind('click', {
+        newPage: page
+      }, function(event) {
+        currentPage = event.data['newPage'];
+        $table.trigger('repaginate');
+        $(this).addClass('active').siblings().removeClass('active');
+      }).appendTo($pager).addClass('clickable');
+    }
+    $pager.insertAfter($table).find('span.page-number:first').addClass('active');
   });
 });
