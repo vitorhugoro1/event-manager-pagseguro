@@ -73,7 +73,8 @@ class PageTemplater {
      'template/page-minha-conta.php' => 'Minha Conta',
      'template/page-selecionar-ingresso.php' => 'Selecionar Ingresso',
      'template/page-confirmacao-pagamento.php' => 'Finalizar Pagamento',
-     'template/page-cadastrar.php'  => 'Cadastrar'
+     'template/page-cadastrar.php'  => 'Cadastrar',
+     'template/page-login.php'  => 'Login'
    );
 
  }

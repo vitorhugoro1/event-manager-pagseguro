@@ -13,6 +13,13 @@ Number.prototype.formatMoney = function(c, d, t) {
 jQuery(document).ready(function($) {
 
   /**
+   * Adiciona mascara nos campos a seguir
+   */
+
+  $("#ddd").mask('##0');
+  $("#tel").mask('0000-0000');
+
+  /**
    * Adiciona um ingresso na lista de compra
    * @type {[type]}
    */
@@ -214,4 +221,58 @@ jQuery(document).ready(function($) {
     }
     $pager.insertAfter($table).find('span.page-number:first').addClass('active');
   });
+
+  /**
+   * Valida se um documento (CPF/CNPJ) está valido com o tipo
+   * @type {[type]}
+   */
+
+  $("#doc").on({
+    click: function(e) {
+      var checked = $("[name=tipo]:checked").val();
+
+      if(checked == 'expositor'){
+        $("#doc").mask('00.000.000/0000-00', {reverse: true});
+      } else if (checked == 'visitante') {
+        $("#doc").mask('000.000.000-00', {reverse: true});
+      } else {
+        alert('Selecione um tipo');
+      }
+
+      e.preventDefault();
+    },
+    ready: function(e) {
+      var checked = $("[name=tipo]:checked").val();
+
+      if(checked == 'expositor'){
+        $("#doc").mask('00.000.000/0000-00', {reverse: true});
+      } else if (checked == 'visitante') {
+        $("#doc").mask('000.000.000-00', {reverse: true});
+      } else {
+        alert('Selecione um tipo');
+      }
+
+      e.preventDefault();
+    }
+  } );
+
+  /**
+   * Cadastrar usuario
+   */
+
+   $('#cadastrar_user').ajaxForm({
+     beforeSubmit: function(arr, $form, options) {
+       var $closing = jQuery('<div class="om-closing"></div>');
+       jQuery('body').append($closing);
+       $closing.fadeTo(400, .8);
+       jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+     },
+     success: function(data) {
+       jQuery('.om-closing').remove();
+       jQuery('.om-loading-circle').remove();
+
+       console.log(data);
+     }
+   });
+
 });

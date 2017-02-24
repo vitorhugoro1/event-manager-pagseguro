@@ -10,6 +10,8 @@ if(!class_exists('VHR_Users')){
     function __construct()
     {
       add_action('admin_post_update_perfil', array($this, 'update_perfil'));
+      add_action('admin_post_cadastrar_user', array($this, 'cadastrar_user'));
+      add_action('admin_post_nopriv_cadastrar_user', array($this, 'cadastrar_user'));
     }
 
     function update_perfil(){
@@ -47,8 +49,9 @@ if(!class_exists('VHR_Users')){
       }
 
       update_user_meta( $user_id, 'ddd', $_POST['ddd'] );
-      update_user_meta( $user_id, 'tel', $this->number_tel($_POST['tel']) );
+      update_user_meta( $user_id, 'tel', $this->number_only($_POST['tel']) );
       update_user_meta( $user_id, 'tipo', $_POST['tipo'] );
+      update_user_meta( $user_id, 'doc', $this->number_only($_POST['doc']) );
 
       wp_send_json_success(array(
         'msg' => 'Perfil atualizado.',
@@ -58,9 +61,45 @@ if(!class_exists('VHR_Users')){
       ));
     }
 
-    protected function number_tel($number){
+    function cadastrar_user(){
+      $nonce = $_POST['_wpnonce'];
+
+      if( ! wp_verify_nonce( $nonce, 'cadastrar_user' ) ){
+        return new WP_Error('valid nonce', "Validação errada");
+      }
+
+      if(email_exists( $_POST['email'] ) && username_exists( $_POST['email'] )){
+        return wp_send_json_error( array(
+          'msg' => 'Email já está em uso.'
+        ) );
+      }
+
+      $arr = array(
+        'display_name'  => $_POST['name'],
+        'user_email'  => $_POST['email'],
+        'user_login'  => $_POST['email'],
+        'user_pass'   => $_POST['pass'],
+        'show_admin_bar_front' => false
+      );
+
+      $user_id = wp_insert_user($arr);
+
+      if(!is_wp_error( $user_id )){
+        update_user_meta( $user_id, 'ddd', $_POST['ddd'] );
+        update_user_meta( $user_id, 'tel', $this->number_only($_POST['tel']) );
+        update_user_meta( $user_id, 'tipo', $_POST['tipo'] );
+        update_user_meta( $user_id, 'doc', $this->number_only($_POST['doc']) );
+      }
+
+      wp_send_json_success(array(
+        'msg' => 'Usuario criado com sucesso.',
+        'redirect'  => home_url()
+      ));
+    }
+
+    protected function number_only($number){
       preg_match_all('/\d+/', $number, $matches);
-      return $matches[0][0];
+      return implode('',$matches[0]);
     }
   }
 }

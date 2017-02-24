@@ -377,27 +377,38 @@ function minha_conta_content($content)
                     $ddd = get_the_author_meta('ddd', $user_id );
                     $tel = get_the_author_meta('tel', $user_id );
                     $tipo = get_the_author_meta('tipo', $user_id );
+                    $doc =  get_the_author_meta('doc', $user_id );
                     ?>
                    <form action="<?php echo admin_url('admin-post.php') ?>" id="update_perfil" method="post">
                      <input type="hidden" name="action" value="update_perfil">
                      <?php wp_nonce_field('update_perfil'); ?>
                      <div class="om-columns om-columns-s-pad">
                        <div class="om-column om-full">
-                         <label for="name">Nome*</label>
-                         <input type="text" id="name" name="name" placeholder="Nome completo" value="<?php echo $name; ?>"><br>
-                         <label for="email">Email*</label>
-                         <input type="email" id="email" name="email" placeholder="email@email.com" value="<?php echo $email; ?>"><br>
-                         <label for="telefone">Telefone*</label>
-                         <input type="text" id="ddd" name="ddd" placeholder="DDD" value="<?=$ddd?>">
-                         <input type="text" id="telefone" name="tel" placeholder="Telefone" value="<?=$tel?>"><br>
-                         <label>Tipo de Perfil*</label><br>
-                         <label for="expositor"><input type="radio" id="expositor" name="tipo" <?php checked( $tipo, 'expositor') ?> value="expositor"> Expositor</label>
-                         <label for="visitante"><input type="radio" id="visitante" name="tipo" <?php checked( $tipo, 'visitante') ?> value="visitante"> Visitante</label><br>
-                         <label for="doc">CPF/CNPJ</label>
-                         <input type="text" id="doc" name="doc" placeholder="Número do documento" value="">
-                       </div>
-                       <div class="om-column om-full">
-                         <input type="submit" value="Atualizar">
+                         <p>
+                           <label for="name">Nome*</label>
+                           <input type="text" id="name" name="name" placeholder="Nome completo" value="<?php echo $name; ?>">
+                         </p>
+                         <p>
+                           <label for="email">Email*</label>
+                           <input type="email" id="email" name="email" placeholder="email@email.com" value="<?php echo $email; ?>">
+                         </p>
+                         <p>
+                           <label for="telefone">Telefone*</label>
+                           <input type="text" id="ddd" name="ddd" placeholder="DDD" value="<?=$ddd?>">
+                           <input type="text" id="telefone" name="tel" placeholder="Telefone" value="<?=$tel?>">
+                         </p>
+                         <p>
+                           <label>Tipo de Perfil*</label><br>
+                           <label for="expositor"><input type="radio" id="expositor" name="tipo" <?php checked( $tipo, 'expositor') ?> value="expositor"> Expositor</label>
+                           <label for="visitante"><input type="radio" id="visitante" name="tipo" <?php checked( $tipo, 'visitante') ?> value="visitante"> Visitante</label>
+                         </p>
+                         <p>
+                           <label for="doc">CPF/CNPJ</label>
+                           <input type="text" id="doc" name="doc" placeholder="Número do documento" value="<?=$doc?>">
+                         </p>
+                         <p>
+                           <input type="submit" value="Atualizar">
+                         </p>
                        </div>
                      </div>
                    </form>
@@ -490,7 +501,74 @@ function minha_conta_content($content)
     return $content;
 }
 
+function login_template($content){
+  if(is_page('login')){
+      ob_start();
+      $args = array(
+        'redirect'  => home_url('/eventos'),
+        'value_remember'  => false,
+        'label_username'  => 'Endereço de e-mail'
+      );
+
+      wp_login_form( $args );
+
+      echo sprintf('<div><a href="%s">%s</a></div>', home_url('/cadastrar') ,'Cadastrar');
+
+      $content .= ob_get_clean();
+  }
+
+  return $content;
+}
+
+function cadastrar_template($content){
+  if(is_page('cadastrar')){
+    ob_start();
+      ?>
+        <form action="<?php echo admin_url('admin-post.php'); ?>" id="cadastrar_user" method="post">
+          <input type="hidden" name="action" value="cadastrar_user">
+          <?php wp_nonce_field( 'cadastrar_user' ); ?>
+          <p>
+            <label for="name">Nome*</label>
+            <input type="text" name="name" id="name" placeholder="Nome completo" required>
+          </p>
+          <p>
+            <label for="email">E-mail*</label>
+            <input type="email" id="email" name="email" placeholder="email@email.com" autocomplete="off" required>
+          </p>
+          <p>
+            <label for="pass">Senha*</label>
+            <input type="password" id="pass" name="pass" placeholder="Digite uma senha" autocomplete="off" required>
+          </p>
+          <p>
+            <label>Tipo de Conta*</label><br>
+            <label for="expositor"><input type="radio" name="tipo" id="expositor" value="expositor"> Expositor</label>
+            <label for="visitante"><input type="radio" name="tipo" id="visitante" value="visitante"> Visitante</label>
+          </p>
+          <p>
+            <label for="doc">CPF/CNPJ*</label>
+            <input type="text" name="doc" id="doc" placeholder="DOC" required>
+          </p>
+          <p>
+            <label for="tel-field">Telefone*</label>
+            <div id="tel-field">
+              <input type="text" id="ddd" name="ddd" placeholder="DDD" required>
+              <input type="text" id="tel" name="tel" placeholder="0000-0000" required>
+            </div>
+          </p>
+          <p>
+            <input type="submit" value="Cadastrar">
+          </p>
+        </form>
+      <?php
+    $content .= ob_get_clean();
+  }
+
+  return $content;
+}
+
 add_filter('the_content', 'filter_content');
 add_filter('the_content', 'add_table_ingresso');
 add_filter('the_content', 'add_finalizar');
 add_filter('the_content', 'minha_conta_content');
+add_filter('the_content', 'login_template');
+add_filter('the_content', 'cadastrar_template');

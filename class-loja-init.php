@@ -27,6 +27,10 @@ class VHR_Loja_Build
 		array(
 			'name' => 'Cadastrar',
 			'template' => 'template/page-cadastrar.php'
+		),
+		array(
+			'name' => 'Login',
+			'template' => 'template/page-login.php'
 		)
 	);
 
