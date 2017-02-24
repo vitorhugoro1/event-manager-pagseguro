@@ -124,6 +124,7 @@ jQuery(document).ready(function($) {
 
           jQuery('.om-closing').remove();
           jQuery('.om-loading-circle').remove();
+          window.location.href = $("#redirect_url").val();
         },
         abort: function() {
           var $closing = jQuery('<div class="om-closing"></div>');
@@ -140,6 +141,7 @@ jQuery(document).ready(function($) {
 
           jQuery('.om-closing').remove();
           jQuery('.om-loading-circle').remove();
+          window.location.href = $("#redirect_url").val();
         }
       });
     }

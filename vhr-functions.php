@@ -245,9 +245,7 @@ function add_finalizar($content){
         <a href="javascript:window.history.back();">Cancelar</a>
         <button type="submit">Finalizar</button>
       </form>
-      <div id="test">
-
-      </div>
+      <input type="hidden" id="redirect_url" value="<?php echo home_url('/minha-conta'); ?>">
     </div>
     <?php
     $content .= ob_get_clean();

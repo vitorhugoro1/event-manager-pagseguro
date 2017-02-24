@@ -20,4 +20,6 @@ if(count($_POST) > 0){
   } catch (Exception $e) {
       die($e->getMessage());
   }
+} else {
+  header('Location:' . home_url());
 }
