@@ -96,9 +96,13 @@ function filter_content($content)
         echo '</ul>';
 
         if ($hoje > $inicio && $hoje < $fim && is_user_logged_in()) {
-            echo sprintf('<a href="%s?refID=%d" class="tickera_button">Comprar</a>', $link, $post->ID);
+            ?>
+              <input type="button" onclick='window.location.href="<?=$link?>?refID=<?=$post->ID?>"' value="Comprar"/>
+            <?php
         } else if($hoje > $inicio && $hoje < $fim) {
-          echo sprintf('<a href="%s" class="tickera_button">Logar</a>', home_url('/login'));
+          ?>
+            <input type="button" onclick='window.location.href="<?=home_url('/login')?>"' value="Logar"/>
+          <?php
         }
 
         $content .= ob_get_clean();

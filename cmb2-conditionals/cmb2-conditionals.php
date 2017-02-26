@@ -104,6 +104,10 @@ if ( ! class_exists( 'CMB2_Conditionals' ) ) {
 		    	return;
 		    }
 
+				if(get_post_type($_REQUEST['post']) == 'page' || get_post_type($_REQUEST['post']) == 'post' ){
+					return;
+				}
+
 			wp_enqueue_script(
 				'cmb2-conditionals',
 				plugins_url( '/cmb2-conditionals.js', __FILE__ ),
