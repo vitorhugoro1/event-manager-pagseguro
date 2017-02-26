@@ -144,7 +144,7 @@ function add_table_ingresso($content)
         ?>">
           <input type="hidden" id="action-url" value="<?php echo admin_url('admin-post.php');
         ?>">
-          <button id="adc-ingresso">Adicionar</button>
+          <input type="button" id="adc-ingresso" value="Adicionar"/>
         </div>
       </div>
       <div class="vc_om-table selecionar-table">
@@ -183,8 +183,10 @@ function add_table_ingresso($content)
               </tr>
             </tfoot>
           </table>
-          <a href="javascript:void(0);" id="rmv-ingresso">Remover</a>
-          <button type="submit">Continuar</button>
+          <p>
+            <input type="button" id="rmv-ingresso" value="Remover" />
+            <input type="submit" value="Continuar"/>
+          </p>
         </form>
       </div>
     <?php
@@ -266,8 +268,10 @@ function add_finalizar($content)
             </tr>
           </tfoot>
         </table>
-        <a href="javascript:window.history.back();">Cancelar</a>
-        <button type="submit">Finalizar</button>
+        <p>
+          <input type="button" onclick="javascript:window.history.back();" value="Cancelar"/>
+          <input type="submit" value="Finalizar"/>
+        </p>
       </form>
       <input type="hidden" id="redirect_url" value="<?php echo home_url('/minha-conta');
         ?>">

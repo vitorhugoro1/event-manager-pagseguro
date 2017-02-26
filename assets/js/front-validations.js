@@ -11,13 +11,20 @@ Number.prototype.formatMoney = function(c, d, t) {
 
 
 jQuery(document).ready(function($) {
+  var checked = $("[name=tipo]:checked").val();
 
   /**
    * Adiciona mascara nos campos a seguir
    */
 
-  $("#ddd").mask('##0');
-  $("#tel").mask('0000-0000');
+  $("#ddd").mask('#0');
+  $("#tel, #telefone").mask('0000-0000');
+
+  if(checked == 'expositor'){
+    $("#doc").mask('00.000.000/0000-00', {reverse: true});
+  } else if (checked == 'visitante') {
+    $("#doc").mask('000.000.000-00', {reverse: true});
+  }
 
   /**
    * Adiciona um ingresso na lista de compra
@@ -240,19 +247,6 @@ jQuery(document).ready(function($) {
       }
 
       e.preventDefault();
-    },
-    ready: function(e) {
-      var checked = $("[name=tipo]:checked").val();
-
-      if(checked == 'expositor'){
-        $("#doc").mask('00.000.000/0000-00', {reverse: true});
-      } else if (checked == 'visitante') {
-        $("#doc").mask('000.000.000-00', {reverse: true});
-      } else {
-        alert('Selecione um tipo');
-      }
-
-      e.preventDefault();
     }
   } );
 
@@ -268,9 +262,9 @@ jQuery(document).ready(function($) {
        jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
      },
      success: function(data) {
-       jQuery('.om-closing').remove();
-       jQuery('.om-loading-circle').remove();
-
+       if(data.success){
+         window.location = data.data.redirect;
+       }
        console.log(data);
      }
    });
