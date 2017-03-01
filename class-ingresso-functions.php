@@ -20,6 +20,7 @@ class VHR_Ingresso_Functions
     add_action('admin_post_pag_code_gen', array($this, 'pag_code_gen'));
     add_action('admin_post_add_notification_code', array($this, 'add_notification_code'));
     add_action('admin_post_add_abort_status', array($this, 'add_abort_status'));
+    add_action('admin_post_resend_email', array($this, 'resend_email'));
     add_action('admin_menu', array($this, 'disable_new_posts'));
     add_action('admin_footer', array($this, 'disable_new_posts_js'));
   }
@@ -563,6 +564,7 @@ class VHR_Ingresso_Functions
     $valores = get_post_meta( $orderID, '_vhr_valores', true );
     $home_url = home_url();
     $notificacao = home_url('/notificacao');
+    $user_id = get_current_user_id();
 
     foreach((array) $args['ingressos'] as $ingresso) {
       $tipo = intval($ingresso['tipo']);
@@ -581,11 +583,11 @@ class VHR_Ingresso_Functions
     $payment->setReference($args['ref']);
 
     // Set your customer information.
-    $payment->setSender()->setName(get_the_author_meta('display_name'));
-    $payment->setSender()->setEmail(get_the_author_meta('user_email'));
+    $payment->setSender()->setName(get_the_author_meta('display_name', $user_id));
+    $payment->setSender()->setEmail(get_the_author_meta('user_email', $user_id));
     $payment->setSender()->setPhone()->withParameters(
-        11,
-        56273440
+        get_the_author_meta( 'ddd', $user_id ),
+        get_the_author_meta( 'tel', $user_id )
     );
 
     // $payment->addParameter()->withParameter('shippingAddressRequired', 'false');
@@ -605,6 +607,38 @@ class VHR_Ingresso_Functions
     } catch (Exception $e) {
         return array('msg' => $e->getMessage(), 'exc' => true);
     }
+  }
+
+  public function resend_email(){
+    $user_id = get_current_user_id();
+    $ref_code = $_POST['ref'];
+    $orderID = $_POST['orderID'];
+    $nonce = $_POST['_wpnonce'];
+
+    if( ! wp_verify_nonce( $nonce, 'resend_email' ) ){
+      return new WP_Error('valid nonce', "Validação errada");
+    }
+
+    $is_ref = (get_post_meta($orderID, 'transaction_id', true) == $ref_code) ? true : false;
+    $is_current = (get_post_meta($orderID, 'user_id', true) == $user_id) ? true : false;
+
+    if($is_ref && $is_current){
+      $to = get_the_author_meta( 'user_email', $user_id );
+      $admin = get_option('admin_send_email') ? get_option('admin_send_email') : get_option('admin_email');
+      $blogname = get_option('blogname');
+      $headers = array("Content-Type: text/html; charset=UTF-8","From: $blogname <$admin>");
+      $subject = "Informações do ingresso #$orderID";
+      $message = wpautop( get_option( 'mail_template' ) );
+
+      $mail = wp_mail( $to, $subject, $message, $headers );
+
+      if($mail){
+        wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
+      } else {
+        wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
+      }
+    }
+
   }
 }
 
