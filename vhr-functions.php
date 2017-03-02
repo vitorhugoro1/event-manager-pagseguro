@@ -446,6 +446,7 @@ function minha_conta_content($content)
                       $ingressos = get_posts($args);
                       ?>
                       <div class="vc_om-table">
+                        <div class="msg"></div>
                         <table class="paginated">
                           <thead>
                             <tr>
@@ -480,9 +481,13 @@ function minha_conta_content($content)
                               <td>
                                 <?php echo $estados[$state]; ?>
                                 <span>
-                                  <?php if($state != 7): ?>
+                                  <?php if($state != 7):
+                                    $admin_post = admin_url( 'admin-post.php' );
+                                    $email_nonce = wp_create_nonce('resend_email');
+                                    $ref = get_post_meta( $ingresso, 'transaction_id', true );
+                                    ?>
 
-                                  <a href="#" class="enviar-email" data-id="<?php echo $ingresso; ?>">Enviar e-mail</a> |
+                                  <a href="javascript:void(0);" data-href="<?=$admin_post?>" data-action="resend_email" data-nonce="<?=$email_nonce?>" data-ref="<?=$ref?>" class="enviar-email" data-id="<?php echo $ingresso; ?>">Enviar e-mail</a> |
                                     <?php if($state == 3): ?>
                                       <a href="#" class="imprimir" data-id="<?php echo $ingresso; ?>">Imprimir</a> |
                                     <?php endif; ?>
@@ -515,9 +520,18 @@ function login_template($content){
       $args = array(
         'redirect'  => home_url('/eventos'),
         'value_remember'  => false,
-        'label_username'  => 'Endereço de e-mail'
+        'label_username'  => 'Nº documento'
       );
 
+      ?>
+        <p>
+          <label>Selecione um tipo de login</label>
+          <p>
+            <label for="visitante"><input type="radio" id="visitante" name="tipo" value="visitante" checked> Visitante</label>
+            <label for="expositor"><input type="radio" id="expositor" name="tipo" value="expositor"> Expositor</label>
+          </p>
+        </p>
+      <?php
       wp_login_form( $args );
 
       echo sprintf('<div><a href="%s">%s</a></div>', home_url('/cadastrar') ,'Cadastrar');

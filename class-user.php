@@ -51,13 +51,14 @@ if(!class_exists('VHR_Users')){
       update_user_meta( $user_id, 'ddd', $_POST['ddd'] );
       update_user_meta( $user_id, 'tel', $this->number_only($_POST['tel']) );
       update_user_meta( $user_id, 'tipo', $_POST['tipo'] );
-      update_user_meta( $user_id, 'doc', $this->number_only($_POST['doc']) );
+      update_user_meta( $user_id, 'doc', $_POST['doc'] );
 
       wp_send_json_success(array(
         'msg' => 'Perfil atualizado.',
         'name' => $_POST['name'],
         'email' => $_POST['email'],
-        'tel' => $_POST['ddd'] . ' ' . $_POST['tel']
+        'tel' => $_POST['ddd'] . ' ' . $_POST['tel'],
+        'doc' => $_POST['doc']
       ));
     }
 
@@ -68,7 +69,7 @@ if(!class_exists('VHR_Users')){
         return new WP_Error('valid nonce', "Validação errada");
       }
 
-      if(email_exists( $_POST['email'] ) && username_exists( $_POST['email'] )){
+      if(email_exists( $_POST['email'] ) && username_exists( $_POST['doc'] )){
         return wp_send_json_error( array(
           'msg' => 'Email já está em uso.'
         ) );
@@ -77,7 +78,7 @@ if(!class_exists('VHR_Users')){
       $arr = array(
         'display_name'  => $_POST['name'],
         'user_email'  => $_POST['email'],
-        'user_login'  => $_POST['email'],
+        'user_login'  => $_POST['doc'],
         'user_pass'   => $_POST['pass'],
         'show_admin_bar_front' => false
       );
@@ -88,12 +89,12 @@ if(!class_exists('VHR_Users')){
         update_user_meta( $user_id, 'ddd', $_POST['ddd'] );
         update_user_meta( $user_id, 'tel', $this->number_only($_POST['tel']) );
         update_user_meta( $user_id, 'tipo', $_POST['tipo'] );
-        update_user_meta( $user_id, 'doc', $this->number_only($_POST['doc']) );
+        update_user_meta( $user_id, 'doc', $_POST['doc'] );
       }
 
       wp_send_json_success(array(
         'msg' => 'Usuario criado com sucesso.',
-        'redirect'  => home_url()
+        'redirect'  => home_url("/login")
       ));
     }
 

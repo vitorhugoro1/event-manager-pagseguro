@@ -613,7 +613,7 @@ class VHR_Ingresso_Functions
     $user_id = get_current_user_id();
     $ref_code = $_POST['ref'];
     $orderID = $_POST['orderID'];
-    $nonce = $_POST['_wpnonce'];
+    $nonce = $_POST['wpnonce'];
 
     if( ! wp_verify_nonce( $nonce, 'resend_email' ) ){
       return new WP_Error('valid nonce', "Validação errada");

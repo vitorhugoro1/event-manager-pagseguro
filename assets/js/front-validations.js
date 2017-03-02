@@ -21,9 +21,9 @@ jQuery(document).ready(function($) {
   $("#tel, #telefone").mask('0000-0000');
 
   if(checked == 'expositor'){
-    $("#doc").mask('00.000.000/0000-00', {reverse: true});
+    $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00'});
   } else if (checked == 'visitante') {
-    $("#doc").mask('000.000.000-00', {reverse: true});
+    $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'000.000.000-00' });
   }
 
   /**
@@ -234,14 +234,14 @@ jQuery(document).ready(function($) {
    * @type {[type]}
    */
 
-  $("#doc").on({
+  $("#doc, #user_login").on({
     click: function(e) {
       var checked = $("[name=tipo]:checked").val();
 
       if(checked == 'expositor'){
-        $("#doc").mask('00.000.000/0000-00', {reverse: true});
+        $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00' });
       } else if (checked == 'visitante') {
-        $("#doc").mask('000.000.000-00', {reverse: true});
+        $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'000.000.000-00' });
       } else {
         alert('Selecione um tipo');
       }
@@ -263,10 +263,54 @@ jQuery(document).ready(function($) {
      },
      success: function(data) {
        if(data.success){
+         alert(data.data.msg);
          window.location = data.data.redirect;
        }
        console.log(data);
      }
+   });
+
+   /**
+    * Re-envia por e-mail o ingresso
+    */
+
+   $('.enviar-email').on('click', function(e){
+     e.preventDefault();
+     var href = $(this).data('href');
+
+     $.ajax({
+       method: "POST",
+       url: href,
+       data:{
+        action: $(this).data('action'),
+        wpnonce: $(this).data('nonce'),
+        orderID: $(this).data('id'),
+        ref: $(this).data('ref')
+       },
+       dataType: "json",
+       beforeSend: function() {
+         var $closing = jQuery('<div class="om-closing"></div>');
+         jQuery('body').append($closing);
+         $closing.fadeTo(400, .8);
+         jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+       },
+       complete: function(data) {
+         jQuery('.om-closing').remove();
+         jQuery('.om-loading-circle').remove();
+
+         var $data = data.responseJSON;
+
+         if($data.success){
+           $('div.vc_om-table .msg').addClass('success').text($data.data.msg);
+         } else {
+           $('div.vc_om-table .msg').addClass('error').text($data.data.msg);
+         }
+
+         setTimeout(function(){ $('div.vc_om-table .msg').text(""); }, 7000);
+
+       }
+     });
+
    });
 
 });
