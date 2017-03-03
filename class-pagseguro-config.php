@@ -138,6 +138,41 @@ class VHR_PagSeguro
                 </p>
               </td>
             </tr>
+            <tr valign="top">
+              <th scope="row">
+                <label for="mail_template_subject">Template do Titulo de E-mail de Resposta</label>
+              </th>
+              <td>
+                <?php $mail_template_subject = get_option('mail_template_subject'); ?>
+                <input type="text" name="mail_template_subject" id="mail_template_subject" class="large-text" value="<?=esc_html($mail_template_subject)?>" placeholder="Template do Titulo de E-mail de Resposta">
+                <p class="description">
+                  Tags aceitas para completar valores automaticamente no título do e-mail:<br>
+                  <code>[order]</code> : Adiciona o número do pedido.<br>
+                  <code>[username]</code> : Adiciona o nome completo do cliente.<br>
+                  <code>[firstname]</code> : Adiciona o primeiro nome do cliente.<br>
+                  <code>[event]</code> : Adiciona o título do evento.
+                </p>
+              </td>
+            </tr>
+            <tr valign="top">
+              <th scope="row">
+                <label for="mail_template">Template do Corpo de E-mail de Resposta</label>
+              </th>
+              <td>
+                <?php $mail_template = get_option('mail_template'); ?>
+                <textarea id="mail_template" name="mail_template" cols="80" rows="10" class="large-text" placeholder="Template de E-mail de Resposta"><?php echo esc_textarea( $mail_template ); ?></textarea>
+                <p class="description">
+                  Tags aceitas para completar valores automaticamente no corpo do e-mail:<br>
+                  <code>[qrcode]</code> : Adiciona a imagem do QRCODE no e-mail.<br>
+                  <code>[order]</code> : Adiciona o número do pedido.<br>
+                  <code>[username]</code> : Adiciona o nome completo do cliente.<br>
+                  <code>[firstname]</code> : Adiciona o primeiro nome do cliente.<br>
+                  <code>[event]</code> : Adiciona o título do evento.<br>
+                  <code>[purchasevalue]</code> : Adiciona o valor total da compra.<br>
+                  <code>[purchaseitems]</code> : Adiciona uma lista dos itens adquiridos da compra.
+                </p>
+              </td>
+            </tr>
           </table>
           <?php submit_button(); ?>
         </form>
