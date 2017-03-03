@@ -316,7 +316,11 @@ function minha_conta_content($content)
                        <label>Email</label>
                        <span data-id="email"><?php echo get_the_author_meta('email', $user_id); ?></span><br>
                        <label>Telefone</label>
-                       <span data-id="tel"><?php echo get_the_author_meta('ddd', $user_id) . ' ' . get_the_author_meta( 'tel', $user_id ); ?></span>
+                       <span data-id="tel"><?php echo get_the_author_meta('ddd', $user_id) . ' ' . get_the_author_meta( 'tel', $user_id ); ?></span><br>
+                       <label>Tipo de Conta</label>
+                       <span data-id="tipo"><?php echo ucfirst(get_the_author_meta('tipo', $user_id)) ?></span><br>
+                       <label>DOC</label>
+                       <span data-id="doc"><?php echo get_the_author_meta('doc', $user_id) ?></span>
                      </div>
                      <div class="infos-compras">
                        <h4 class="tab-internal-title">Ultímos ingressos comprados</h4>
@@ -406,13 +410,13 @@ function minha_conta_content($content)
                            <input type="text" id="telefone" name="tel" placeholder="Telefone" value="<?=$tel?>">
                          </p>
                          <p>
-                           <label>Tipo de Perfil*</label><br>
+                           <label>Tipo de Conta*</label><br>
                            <label for="expositor"><input type="radio" id="expositor" name="tipo" <?php checked( $tipo, 'expositor') ?> value="expositor"> Expositor</label>
                            <label for="visitante"><input type="radio" id="visitante" name="tipo" <?php checked( $tipo, 'visitante') ?> value="visitante"> Visitante</label>
                          </p>
                          <p>
-                           <label for="doc">CPF/CNPJ</label>
-                           <input type="text" id="doc" name="doc" placeholder="Número do documento" value="<?=$doc?>">
+                           <label for="doc">CPF/CNPJ*</label>
+                           <input type="text" id="doc" name="doc" placeholder="DOC" value="<?=$doc?>">
                          </p>
                          <p>
                            <input type="submit" value="Atualizar">

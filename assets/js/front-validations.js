@@ -12,6 +12,7 @@ Number.prototype.formatMoney = function(c, d, t) {
 
 jQuery(document).ready(function($) {
   var checked = $("[name=tipo]:checked").val();
+  var $type = $("[data-id='tipo']").text().toLowerCase();
 
   /**
    * Adiciona mascara nos campos a seguir
@@ -19,6 +20,13 @@ jQuery(document).ready(function($) {
 
   $("#ddd").mask('#0');
   $("#tel, #telefone").mask('0000-0000');
+  $("[data-id='tel']").mask('(00) 0000-0000');
+
+  if($type == 'expositor'){
+    $("[data-id='doc']").mask('00.000.000/0000-00');
+  } else if ($type == 'visitante') {
+    $("[data-id='doc']").mask('000.000.000-00');
+  }
 
   if(checked == 'expositor'){
     $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00'});
