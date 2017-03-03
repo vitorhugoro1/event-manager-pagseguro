@@ -151,10 +151,12 @@ class VHR_PagSeguro
     $email = sanitize_email($_POST['email']);
     $token = sanitize_text_field($_POST['token']);
     $sandbox = $_POST['sandbox'];
+    $acceptPayment = $_POST['acceptPayment'];
 
     update_option('email_pagseguro', $email);
     update_option('token_pagseguro', $token);
     update_option('sandbox', $sandbox);
+    update_option( 'acceptPayment', $acceptPayment);
 
     wp_redirect(wp_get_referer());
   }

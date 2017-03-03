@@ -601,9 +601,9 @@ class VHR_Ingresso_Functions
 
     $payment->addParameter()->withParameters('shippingAddressRequired', 'false');
     $payment->addParameter()->withParameters('acceptPaymentMethodGroup', 'CREDIT_CARD');
-    $payment->addParameter()->withParameters('paymentMethodGroup1', 'CREDIT_CARD');
-    $payment->addParameter()->withParameters('paymentMethodConfigKey1_1', 'MAX_INSTALLMENTS_NO_INTEREST');
-    $payment->addParameter()->withParameters('paymentMethodConfigValue1_1', '6');
+    // $payment->addParameter()->withParameters('paymentMethodGroup1', 'CREDIT_CARD');
+    // $payment->addParameter()->withParameters('paymentMethodConfigKey1_1', 'MAX_INSTALLMENTS_NO_INTEREST');
+    // $payment->addParameter()->withParameters('paymentMethodConfigValue1_1', '6');
     $payment->setRedirectUrl($home_url);
     $payment->setNotificationUrl($notificacao);
 
