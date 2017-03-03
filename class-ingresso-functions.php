@@ -590,9 +590,20 @@ class VHR_Ingresso_Functions
         get_the_author_meta( 'tel', $user_id )
     );
 
-    // $payment->addParameter()->withParameter('shippingAddressRequired', 'false');
+    // $payment->setShipping()->setAddress()->withParameters(false);
 
-    $payment->setPaymentMethod(array(\PagSeguro\Enum\PaymentMethod\Group::CREDIT_CARD));
+    if('visitante' == get_the_author_meta( 'tipo', $user_id )){
+      $payment->setSender()->setDocument()->withParameters(
+        'CPF',
+        $this->number_only(get_the_author_meta( 'doc', $user_id ))
+      );
+    }
+
+    $payment->addParameter()->withParameters('shippingAddressRequired', 'false');
+    $payment->addParameter()->withParameters('acceptPaymentMethodGroup', 'CREDIT_CARD');
+    $payment->addParameter()->withParameters('paymentMethodGroup1', 'CREDIT_CARD');
+    $payment->addParameter()->withParameters('paymentMethodConfigKey1_1', 'MAX_INSTALLMENTS_NO_INTEREST');
+    $payment->addParameter()->withParameters('paymentMethodConfigValue1_1', '6');
     $payment->setRedirectUrl($home_url);
     $payment->setNotificationUrl($notificacao);
 
@@ -639,6 +650,11 @@ class VHR_Ingresso_Functions
       }
     }
 
+  }
+
+  protected function number_only($number){
+    preg_match_all('/\d+/', $number, $matches);
+    return implode('',$matches[0]);
   }
 }
 
