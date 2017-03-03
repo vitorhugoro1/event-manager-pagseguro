@@ -83,6 +83,19 @@ class VHR_PagSeguro
     ?>
       <div class="wrap">
         <h1><?php echo get_admin_page_title(); ?></h1>
+        <?php if( filter_input(INPUT_GET, 'notice') === 'success'): ?>
+        <div class="notice notice-success">
+          <p>
+            Configurações atualizadas com sucesso.
+          </p>
+        </div>
+        <?php elseif( filter_input(INPUT_GET, 'notice') === 'error'): ?>
+          <div class="notice notice-error">
+            <p>
+              Erro ao atualizar as configurações.
+            </p>
+          </div>
+        <?php endif; ?>
         <p>Configurações do PagSeguro para configurar o sistema de pagamentos.</p>
         <form action="admin-post.php" method="post">
           <input type="hidden" name="action" value="pagseguro_options">
@@ -187,13 +200,19 @@ class VHR_PagSeguro
     $token = sanitize_text_field($_POST['token']);
     $sandbox = $_POST['sandbox'];
     $acceptPayment = $_POST['acceptPayment'];
+    $mail_template = $_POST['mail_template'];
+    $mail_template_subject = $_POST['mail_template_subject'];
 
     update_option('email_pagseguro', $email);
     update_option('token_pagseguro', $token);
     update_option('sandbox', $sandbox);
-    update_option( 'acceptPayment', $acceptPayment);
+    update_option('acceptPayment', array('CREDIT_CARD'));
+    update_option('mail_template', $mail_template );
+    update_option('mail_template_subject', $mail_template_subject );
 
-    wp_redirect(wp_get_referer());
+    $redirect = add_query_arg('notice', 'success', wp_get_referer());
+
+    wp_redirect($redirect);
   }
 
 }
