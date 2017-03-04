@@ -451,13 +451,19 @@ class VHR_Ingresso_Functions
 
     $status = $response->getStatus();
 
-    if($status != 1){
-      update_post_meta( $_POST['orderID'], 'transaction_state', $status);
+    if($_POST['transactionCode'] == '' || isset($_POST['transactionCode'])){
+      update_post_meta( $_POST['orderID'], 'transaction_state', 7);
+      update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
+    } else {
+      if($status != 1){
+        update_post_meta( $_POST['orderID'], 'transaction_state', $status);
 
-      if($status == 7){
-        update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
+        if($status == 7){
+          update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
+        }
       }
     }
+
 
     if(is_wp_error( $post_id )){
       $errors = $post_id->get_error_messages();

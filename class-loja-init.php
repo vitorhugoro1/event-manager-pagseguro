@@ -63,7 +63,7 @@ class VHR_Loja_Build
 		$pages = $this->pages;
 
 		foreach($pages as $page){
-				register_new_page($page['name'], '', $page['template']);
+				VHR_Helpers::register_new_page($page['name'], '', $page['template']);
 		}
 	}
 }

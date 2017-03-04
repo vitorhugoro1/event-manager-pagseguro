@@ -100,6 +100,15 @@ jQuery(document).ready(function($) {
     });
   });
 
+  $("#initial-order").submit(function(e){
+    var size = $(this).find('tbody').children('tr').length;
+
+    if(0 === size){
+      alert('Adicione ao menos um ingresso.');
+      return false;
+    }
+  });
+
   /**
    * Remove um ingresso da lista de compra
    * @type {[type]}
@@ -266,7 +275,6 @@ jQuery(document).ready(function($) {
          alert(data.data.msg);
          window.location = data.data.redirect;
        }
-       console.log(data);
      }
    });
 

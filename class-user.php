@@ -40,7 +40,8 @@ if(!class_exists('VHR_Users')){
       $user_id = wp_update_user( array(
         'ID'  => $user_id,
         'user_email'  => $_POST['email'],
-        'display_name'  => $_POST['name'],
+        'first_name'  => $_POST['name'],
+        'last_name'   => $_POST['lastname'],
         'show_admin_bar_front'  => false
       ) );
 
@@ -82,7 +83,8 @@ if(!class_exists('VHR_Users')){
       }
 
       $arr = array(
-        'display_name'  => $_POST['name'],
+        'first_name'  => $_POST['name'],
+        'last_name'   => $_POST['lastname'],
         'user_email'  => $_POST['email'],
         'user_login'  => $_POST['doc'],
         'user_pass'   => $_POST['pass'],
