@@ -26,7 +26,7 @@ class VHR_Screens
     {
         global $post;
 
-        if ('eventos' == get_post_type($post) && !is_single($post) || 'eventos' == get_post_type($post) && is_single()) {
+        if ('eventos' == get_post_type($post) && is_single()) {
             $valores = get_post_meta($post->ID, '_vhr_valores', true);
             $datas = get_post_meta($post->ID, '_vhr_periodo', true);
             $inicio = DateTime::createFromFormat('d/m/Y', $datas['start']);
@@ -56,6 +56,41 @@ class VHR_Screens
             } elseif ($hoje > $inicio && $hoje < $fim) {
                 ?>
             <input type="button" onclick='window.location.href="<?=home_url('/login')?>"' value="Logar"/>
+          <?php
+
+            }
+
+            $content .= ob_get_clean();
+        } else if('eventos' == get_post_type($post) && !is_single($post)){
+            $valores = get_post_meta($post->ID, '_vhr_valores', true);
+            $datas = get_post_meta($post->ID, '_vhr_periodo', true);
+            $inicio = DateTime::createFromFormat('d/m/Y', $datas['start']);
+            $fim = DateTime::createFromFormat('d/m/Y', $datas['end']);
+            $hoje = new DateTime();
+            $comprarID = get_page_by_title('Selecionar Ingresso');
+            $link = get_the_permalink($comprarID->ID);
+
+            ob_start();
+            echo '<ul>';
+            foreach ($valores as $val) {
+                $day = new VHR_Loja_Meta_Boxes();
+                if ($val['multiplo']) {
+                    $dia = $day->get_day_event($post->ID, $val['dia-multiplo'], true);
+                } else {
+                    $dia = $day->get_day_event($post->ID, $val['dia-simples']);
+                }
+                echo sprintf('<li>%s ( %s ) - R$ %s</li>', $val['label'], $dia, $val['valor']);
+            }
+            echo '</ul>';
+
+            if ($hoje > $inicio && $hoje < $fim && is_user_logged_in()) {
+                ?>
+              <!-- <input type="button" onclick='window.location.href="<?=$link?>?refID=<?=$post->ID?>"' value="Comprar"/> -->
+            <?php
+
+            } elseif ($hoje > $inicio && $hoje < $fim) {
+                ?>
+            <!-- <input type="button" onclick='window.location.href="<?=home_url('/login')?>"' value="Logar"/> -->
           <?php
 
             }
@@ -240,7 +275,7 @@ class VHR_Screens
                            <span data-id="name"><?php echo get_the_author_meta('display_name', $user_id); ?></span><br>
                            <label>Email</label>
                            <span data-id="email"><?php echo get_the_author_meta('email', $user_id); ?></span><br>
-                           <label>Telefone</label>
+                           <label>Celular</label>
                            <span data-id="tel"><?php echo get_the_author_meta('ddd', $user_id).' '.get_the_author_meta('tel', $user_id); ?></span><br>
                            <label>Tipo de Conta</label>
                            <span data-id="tipo"><?php echo ucfirst(get_the_author_meta('tipo', $user_id)) ?></span><br>
@@ -280,10 +315,11 @@ class VHR_Screens
                                         foreach ($ingressos as $ingresso) {
                                             $title = get_the_title($ingresso);
                                             $transaction_state = get_post_meta($ingresso, 'transaction_state', true);
-                                            $value = number_format(floatval(get_post_meta($ingresso, 'valor', true)), 2, ',', '.'); ?>
+                                            $value = number_format(floatval(get_post_meta($ingresso, 'valor', true)), 2, ',', '.');
+                                            $state = ($transaction_state != '') ? $this->estados[$transaction_state] : 'Cancelado'; ?>
                                     <tr>
                                       <td> <?=$title?> </td>
-                                      <td> <?=$this->$estados[$transaction_state]?> </td>
+                                      <td> <?=$state?> </td>
                                       <td> <?=sprintf('R$ %s', $value)?> </td>
                                     </tr>
                                   <?php
@@ -335,7 +371,7 @@ class VHR_Screens
                                <input type="email" id="email" name="email" placeholder="email@email.com" required value="<?=$email?>">
                              </p>
                              <p>
-                               <label for="telefone">Telefone*</label>
+                               <label for="telefone">Celular*</label>
                                <input type="text" id="ddd" name="ddd" placeholder="DDD" value="<?=$ddd?>" required>
                                <input type="text" id="telefone" name="tel" placeholder="00000-0000" value="<?=$tel?>" required>
                              </p>
@@ -387,7 +423,7 @@ class VHR_Screens
                                   <th> Nº </th>
                                   <th> Evento </th>
                                   <th> Estado da transação </th>
-                                  <th> Ações </th>
+                                  <th> &nbsp; </th>
                                   <th> Valor </th>
                                 </tr>
                               </thead>
@@ -398,13 +434,14 @@ class VHR_Screens
                                   $order = get_the_title($ingresso);
                                   $title = get_the_title(get_post_meta($ingresso, 'evento_id', true));
                                   $state = get_post_meta($ingresso, 'transaction_state', true);
+                                  $pstate = ($state != '') ? $this->estados[$state] : 'Cancelado';
                                   $valor = floatval(get_post_meta($ingresso, 'valor', true));
                                   $value = number_format($valor, 2, ',', '.');
                                   ?>
                                 <tr>
                                   <td> <?=$order?> </td>
                                   <td> <?=$title?> </td>
-                                  <td> <?=$this->$estados[$state]?> </td>
+                                  <td> <?=$pstate?> </td>
                                   <td>
                                       <?php
                                        if ($state != 7){
@@ -506,7 +543,7 @@ class VHR_Screens
                 <input type="text" name="doc" id="doc" placeholder="DOC" required>
               </p>
               <p>
-                <label for="tel-field">Telefone*</label>
+                <label for="tel-field">Celular*</label>
                 <div id="tel-field">
                   <input type="text" id="ddd" name="ddd" placeholder="DDD" required>
                   <input type="text" id="tel" name="tel" placeholder="00000-0000" required>

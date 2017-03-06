@@ -12,6 +12,7 @@ define('LOJA_ROOT', plugin_dir_path( __FILE__ ));
 define('LOJA_ASSETS', LOJA_ROOT . 'assets/');
 
 require LOJA_ROOT . 'pagseguro/vendor/autoload.php';
+require LOJA_ROOT . 'PHPExcel-1.8/vendor/autoload.php';
 require LOJA_ROOT . 'cmb2/init.php';
 require LOJA_ROOT . 'cmb2-conditionals/cmb2-conditionals.php';
 require LOJA_ROOT . 'cmb2-date-range/wds-cmb2-date-range-field.php';
@@ -26,4 +27,5 @@ require LOJA_ROOT . 'class-meta-boxes.php';
 require LOJA_ROOT . 'class-ingresso-functions.php';
 require LOJA_ROOT . 'class-eventos-setup.php';
 require LOJA_ROOT . 'class-loja-init.php';
+require LOJA_ROOT . 'class-exportar.php';
 require LOJA_ASSETS . 'load-assets.php';

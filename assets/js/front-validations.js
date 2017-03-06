@@ -274,6 +274,10 @@ jQuery(document).ready(function($) {
        if(data.success){
          alert(data.data.msg);
          window.location = data.data.redirect;
+       } else {
+         alert(data.data.msg);
+         jQuery('.om-closing').remove();
+         jQuery('.om-loading-circle').remove();
        }
      }
    });
