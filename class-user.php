@@ -12,6 +12,7 @@ if(!class_exists('VHR_Users')){
       add_action('admin_post_update_perfil', array($this, 'update_perfil'));
       add_action('admin_post_cadastrar_user', array($this, 'cadastrar_user'));
       add_action('admin_post_nopriv_cadastrar_user', array($this, 'cadastrar_user'));
+      add_action('admin_post_nopriv_validate_user_name', array($this, 'validate_user_name'));
     }
 
     function update_perfil(){
@@ -104,6 +105,25 @@ if(!class_exists('VHR_Users')){
         'msg' => 'Usuario criado com sucesso.',
         'redirect'  => home_url("/login")
       ));
+    }
+
+    public function validate_user_name(){
+      $nonce = $_POST['_wpnonce'];
+
+      if( ! wp_verify_nonce( $nonce, 'validate_user_name' ) ){
+        wp_send_json_error("Validação errada");
+      }
+
+      $doc = $_POST['doc'];
+
+      if(! username_exists($doc) ){
+        $redirect = home_url('/cadastrar');
+        return wp_send_json_success(array(
+          'redirect'  => $redirect
+        ));
+      } else {
+        return wp_send_json_error("CPF já está em uso.");
+      }
     }
 
     protected function number_only($number){

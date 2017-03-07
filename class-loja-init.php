@@ -31,6 +31,10 @@ class VHR_Loja_Build
 		array(
 			'name' => 'Login',
 			'template' => 'template/page-login.php'
+		),
+		array(
+			'name' => 'Conta',
+			'template' => 'template/page-conta.php'
 		)
 	);
 

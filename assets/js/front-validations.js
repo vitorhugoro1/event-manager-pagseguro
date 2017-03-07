@@ -20,11 +20,11 @@ jQuery(document).ready(function($) {
   $("#ddd").mask('#0');
   $("#tel, #telefone").mask('00000-0000');
 
-  if(checked == 'expositor'){
-    $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00'});
-  } else if (checked == 'visitante') {
-    $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'000.000.000-00' });
-  }
+  // if(checked == 'expositor'){
+  //   $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00'});
+  // } else if (checked == 'visitante') {
+    $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'CPF', autocomplete: false });
+  // }
 
   /**
    * Adiciona um ingresso na lista de compra
@@ -243,21 +243,40 @@ jQuery(document).ready(function($) {
    * @type {[type]}
    */
 
-  $("#doc, #user_login").on({
-    click: function(e) {
-      var checked = $("[name=tipo]:checked").val();
+  // $("#doc, #user_login").on({
+  //   click: function(e) {
+  //     var checked = $("[name=tipo]:checked").val();
+  //
+  //     if(checked == 'expositor'){
+  //       $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00' });
+  //     } else if (checked == 'visitante') {
+  //       $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'000.000.000-00' });
+  //     } else {
+  //       alert('Selecione um tipo');
+  //     }
+  //
+  //     e.preventDefault();
+  //   }
+  // } );
 
-      if(checked == 'expositor'){
-        $("#doc, #user_login").mask('00.000.000/0000-00', {reverse: true, placeholder:'00.000.000/0000-00' });
-      } else if (checked == 'visitante') {
-        $("#doc, #user_login").mask('000.000.000-00', {reverse: true, placeholder:'000.000.000-00' });
+  $("#validate_user_name").ajaxForm({
+    beforeSubmit: function(arr, $form, options) {
+      var $closing = jQuery('<div class="om-closing"></div>');
+      jQuery('body').append($closing);
+      $closing.fadeTo(400, .8);
+      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+    },
+    success: function(data) {
+      if(data.success){
+        window.location = data.data.redirect;
       } else {
-        alert('Selecione um tipo');
+        console.log(data);
+        alert(data.data);
+        jQuery('.om-closing').remove();
+        jQuery('.om-loading-circle').remove();
       }
-
-      e.preventDefault();
     }
-  } );
+  });
 
   /**
    * Cadastrar usuario

@@ -20,6 +20,7 @@ class VHR_Screens
         add_filter('the_content', array($this, 'minha_conta_screen'));
         add_filter('the_content', array($this, 'login_screen'));
         add_filter('the_content', array($this, 'cadastrar_screen'));
+        add_filter('the_content', array($this, 'conta_screen'));
     }
 
     public function archive_loop_filter($content)
@@ -505,6 +506,45 @@ class VHR_Screens
           echo sprintf('<div><a href="%s">%s</a></div>', home_url('/cadastrar') ,'Cadastrar');
 
           $content .= ob_get_clean();
+      }
+
+      return $content;
+    }
+
+    function conta_screen($content){
+      if(is_page('conta')){
+        ob_start();
+        ?>
+          <div class="om-columns">
+            <div class="om-column om-one-half">
+              <h3>Ainda não possuo conta</h3>
+              <p>Informe o número do seu CPF abaixo, Use somente algarismos.</p>
+              <form action="<?=admin_url('admin-post.php')?>" id="validate_user_name" method="post">
+                <input type="hidden" name="action" value="validate_user_name">
+                <?php wp_nonce_field('validate_user_name') ?>
+                <input type="text" name="doc" id="doc" placeholder="CPF" required>
+                <p>
+                  <input type="submit" value="Enviar">
+                </p>
+              </form>
+            </div>
+            <div class="om-column om-one-half">
+              <h3>Já possuo conta</h3>
+              <p>Donec id ligula et orci tempor vehicula sed suscipit orci. Aenean vel aliquam ligula, non consequat lacus.</p>
+              <?php
+              $args = array(
+                'redirect'       => ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+              	'label_username' => __( '' ),
+              	'label_password' => __( '' ),
+              	'label_remember' => __( 'Remember Me' ),
+              	'label_log_in'   => __( 'Enviar' ),
+              );
+               wp_login_form($args); ?>
+              <p>Esqueceu sua senha? <a href="#">Recupere</a></p>
+            </div>
+          </div>
+        <?php
+        $content .= ob_get_clean();
       }
 
       return $content;
