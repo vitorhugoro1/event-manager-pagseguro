@@ -28,7 +28,7 @@ class VHR_Helpers
   {
       $new_page_id = null;
 
-      $page_check = get_page_by_title($new_page_title);
+      $page_check = get_page_by_path(sanitize_title($new_page_title));
       $new_page = array(
               'post_type' => 'page',
               'post_title' => $new_page_title,

@@ -1,7 +1,4 @@
 <?php
-if(is_user_logged_in()){
-	header('Location:' . home_url('/minha-conta'));
-}
 $page_slider=eventerra_get_page_slider($post->ID);
 eventerra_custom_sidebar_setup($post->ID);
 eventerra_wpb_detect($post);

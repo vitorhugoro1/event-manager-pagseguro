@@ -18,16 +18,16 @@ class VHR_Screens
         add_filter('the_content', array($this, 'selecionar_ingresso_screen'));
         add_filter('the_content', array($this, 'confirmacao_pagamento_screen'));
         add_filter('the_content', array($this, 'minha_conta_screen'));
-        add_filter('the_content', array($this, 'login_screen'));
         add_filter('the_content', array($this, 'cadastrar_screen'));
         add_filter('the_content', array($this, 'conta_screen'));
+        add_filter('the_content', array($this, 'resumo_compra_screen'));
     }
 
     public function archive_loop_filter($content)
     {
         global $post;
 
-        if ('eventos' == get_post_type($post) && is_single()) {
+        if ('eventos' == get_post_type($post) && is_single($post)) {
             $valores = get_post_meta($post->ID, '_vhr_valores', true);
             $datas = get_post_meta($post->ID, '_vhr_periodo', true);
             $inicio = DateTime::createFromFormat('d/m/Y', $datas['start']);
@@ -49,14 +49,14 @@ class VHR_Screens
             }
             echo '</ul>';
 
-            if ($hoje > $inicio && $hoje < $fim && is_user_logged_in()) {
+            if (($hoje > $inicio || $hoje == $inicio) && $hoje < $fim && is_user_logged_in()) {
                 ?>
               <input type="button" onclick='window.location.href="<?=$link?>?refID=<?=$post->ID?>"' value="Comprar"/>
             <?php
 
-            } elseif ($hoje > $inicio && $hoje < $fim) {
+            } elseif (($hoje > $inicio || $hoje == $inicio) && $hoje < $fim) {
                 ?>
-            <input type="button" onclick='window.location.href="<?=home_url('/login')?>"' value="Logar"/>
+            <input type="button" onclick='window.location.href="<?=home_url('/conta')?>"' value="Logar"/>
           <?php
 
             }
@@ -84,18 +84,6 @@ class VHR_Screens
             }
             echo '</ul>';
 
-            if ($hoje > $inicio && $hoje < $fim && is_user_logged_in()) {
-                ?>
-              <!-- <input type="button" onclick='window.location.href="<?=$link?>?refID=<?=$post->ID?>"' value="Comprar"/> -->
-            <?php
-
-            } elseif ($hoje > $inicio && $hoje < $fim) {
-                ?>
-            <!-- <input type="button" onclick='window.location.href="<?=home_url('/login')?>"' value="Logar"/> -->
-          <?php
-
-            }
-
             $content .= ob_get_clean();
         }
 
@@ -107,12 +95,14 @@ class VHR_Screens
         global $post;
 
         if (is_page('selecionar-ingresso')) {
-            ob_start();
-            $refID = intval($_GET['refID']);
+          $pagseguro = new VHR_PagSeguro();
+          $pagseguro->add_pagseguro_init();
+          ob_start();
+          $refID = intval($_GET['refID']);
             $valores = get_post_meta($refID, '_vhr_valores', true); ?>
           <div class="om-columns">
             <div class="om-column om-full">
-                Evento : <?=get_the_title($refID)?>
+                <em>Evento : <?=get_the_title($refID)?></em>
             </div>
             <div class="om-column om-two-third">
               <div class="select-ingresso">
@@ -136,8 +126,10 @@ class VHR_Screens
             </div>
           </div>
           <div class="vc_om-table selecionar-table">
-            <form action="<?=home_url('/confirmacao-pagamento')?>" id="initial-order" method="post">
+            <form action="<?=admin_url('admin-post.php')?>" id="order" method="post">
+              <input type="hidden" name="action" value="pag_code_gen">
               <input type="hidden" name="refID" value="<?=intval($refID)?>">
+              <?php wp_nonce_field('finalize') ?>
               <table id="table-form">
                 <thead>
                   <tr>
@@ -172,9 +164,10 @@ class VHR_Screens
               <p>
                 <input type="button" onclick="javascript:history.back();" value="Cancelar">
                 <input type="button" id="rmv-ingresso" value="Remover"/>
-                <input type="submit" value="Continuar"/>
+                <input type="submit" value="Pagar"/>
               </p>
             </form>
+            <input type="hidden" id="resumo" value="<?=home_url('/resumo-da-compra')?>">
           </div>
         <?php
         $content .= ob_get_clean();
@@ -382,7 +375,7 @@ class VHR_Screens
                                <label for="visitante"><input type="radio" id="visitante" name="tipo" <?php checked($tipo, 'visitante') ?> value="visitante"> Visitante</label>
                              </p>
                              <p>
-                               <label for="doc">CPF/CNPJ*</label>
+                               <label for="doc">CPF*</label>
                                <input type="text" id="doc" name="doc" placeholder="DOC" value="<?=$doc?>" required>
                              </p>
                              <p>
@@ -476,39 +469,14 @@ class VHR_Screens
                  </div>
 
               </div>
+              <p>
+                <input type="button" onclick="window.location.href="<?=wp_logout_url( home_url() )?>"" value="Logout">
+              </p>
         <?php
         $content .= ob_get_clean();
         }
 
         return $content;
-    }
-
-    function login_screen($content){
-      if(is_page('login')){
-          ob_start();
-          $args = array(
-            'redirect'  => home_url('/eventos'),
-            'value_remember'  => false,
-            'label_username'  => 'Nº documento'
-          );
-
-          ?>
-            <p>
-              <label>Selecione um tipo de login</label>
-              <p>
-                <label for="visitante"><input type="radio" id="visitante" name="tipo" value="visitante" checked> Visitante</label>
-                <label for="expositor"><input type="radio" id="expositor" name="tipo" value="expositor"> Expositor</label>
-              </p>
-            </p>
-          <?php
-          wp_login_form( $args );
-
-          echo sprintf('<div><a href="%s">%s</a></div>', home_url('/cadastrar') ,'Cadastrar');
-
-          $content .= ob_get_clean();
-      }
-
-      return $content;
     }
 
     function conta_screen($content){
@@ -540,7 +508,7 @@ class VHR_Screens
               	'label_log_in'   => __( 'Enviar' ),
               );
                wp_login_form($args); ?>
-              <p>Esqueceu sua senha? <a href="#">Recupere</a></p>
+              <p>Esqueceu sua senha? <a href="<?=wp_lostpassword_url( home_url('/minha-conta') )?>">Recupere</a></p>
             </div>
           </div>
         <?php
@@ -579,8 +547,8 @@ class VHR_Screens
                 <label for="visitante"><input type="radio" name="tipo" id="visitante" value="visitante"> Visitante</label>
               </p>
               <p>
-                <label for="doc">CPF/CNPJ*</label>
-                <input type="text" name="doc" id="doc" placeholder="DOC" required>
+                <label for="doc">CPF*</label>
+                <input type="text" name="doc" id="doc" placeholder="DOC" value="<?=trim($_POST['doc'])?>" required>
               </p>
               <p>
                 <label for="tel-field">Celular*</label>
@@ -594,6 +562,70 @@ class VHR_Screens
               </p>
             </form>
           <?php
+        $content .= ob_get_clean();
+      }
+
+      return $content;
+    }
+
+    function resumo_compra_screen($content){
+      if(is_page('resumo-da-compra')){
+        ob_start();
+        extract($_POST);
+        $ingressos = get_post_meta( $orderID, 'ingressos', true );
+        $refID = get_post_meta( $orderID, 'evento_id', true );
+        $valores = get_post_meta($refID, '_vhr_valores', true);
+        $valor = get_post_meta( $orderID, 'valor', true );
+        $status = get_post_meta($orderID, 'transaction_state', true);
+        $result = ($status != 7) ? 'Transação concluída com sucesso' : 'Transação cancelada pelo usuário';
+        ?>
+          <div class="vc_om-table">
+            <h3>Evento: <?=get_the_title($refID)?></h3>
+            <table>
+              <thead>
+                <tr>
+                  <th><?=$result?></th>
+                  <th><?=get_the_date('d/m/Y - H:i', $refID)?></th>
+                  <th>PagSeguro</th>
+                </tr>
+                <tr>
+                  <th>Tipo de Ingresso</th>
+                  <th>Quantidade</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($ingressos as $k => $ingresso) : ?>
+                    <tr>
+                      <td>
+                        <?=$valores[$ingresso['tipo']]['label']?>
+                      </td>
+                      <td>
+                        <?=$ingresso['qtd']?>
+                      </td>
+                      <td>
+                        <?=number_format(floatval($ingresso['valor']), 2, ',', '.')?>
+                      </td>
+                    </tr>
+                <?php endforeach; ?>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="2">
+                    <span class="alignright" style="margin:0;">Total</span>
+                  </th>
+                  <th>
+                    <span id="total-span"><?=number_format(floatval($valor), 2, ',', '.')?></span>
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+            <p>Você receberá um e-mail com a conformação de sua transação e instruções de como usar o seu ingresso.</p>
+            <p>
+              <input type="button" onclick='window.location.href="<?=home_url()?>"' value="Voltar para o site">
+            </p>
+          </div>
+        <?php
         $content .= ob_get_clean();
       }
 

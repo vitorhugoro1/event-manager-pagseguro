@@ -100,12 +100,82 @@ jQuery(document).ready(function($) {
     });
   });
 
-  $("#initial-order").submit(function(e){
-    var size = $(this).find('tbody').children('tr').length;
+  $("#order").ajaxForm({
+    beforeSubmit: function(){
+      var $closing = jQuery('<div class="om-closing"></div>');
+      jQuery('body').append($closing);
+      $closing.fadeTo(400, .8);
+      jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+    },
+    success: function(data){
+      jQuery('.om-closing').remove();
+      jQuery('.om-loading-circle').remove();
 
-    if(0 === size){
-      alert('Adicione ao menos um ingresso.');
-      return false;
+      PagSeguroLightbox({
+        code: data.code
+      }, {
+        success: function(transactionCode) {
+          var $closing = jQuery('<div class="om-closing"></div>');
+          jQuery('body').append($closing);
+          $closing.fadeTo(400, .8);
+          jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+
+          $.post($('#order').attr('action'), {
+            action: 'add_notification_code',
+            orderID: data.orderID,
+            transactionCode: transactionCode
+          }, function(result) {
+            console.log(result);
+
+            var f = document.createElement("form");
+            f.setAttribute('method',"post");
+            f.setAttribute('action',$("#resumo").val());
+
+            var i = document.createElement("input"); //input element, text
+            i.setAttribute('type',"hidden");
+            i.setAttribute('name',"orderID");
+            i.setAttribute('value', data.orderID);
+
+            f.appendChild(i);
+            $(document.body).append(f);
+            f.submit();
+
+            jQuery('.om-closing').remove();
+            jQuery('.om-loading-circle').remove();
+          });
+
+        },
+        abort: function() {
+          var $closing = jQuery('<div class="om-closing"></div>');
+          jQuery('body').append($closing);
+          $closing.fadeTo(400, .8);
+          jQuery('<div class="om-loading-circle"></div>').appendTo('body').css('z-index', '100001').fadeIn(200);
+
+          $.post($('#order').attr('action'), {
+            action: 'add_abort_status',
+            orderID: data.orderID
+          }, function(result) {
+            console.log(result);
+
+            var f = document.createElement("form");
+            f.setAttribute('method',"post");
+            f.setAttribute('action',$("#resumo").val());
+
+            var i = document.createElement("input"); //input element, text
+            i.setAttribute('type',"hidden");
+            i.setAttribute('name',"orderID");
+            i.setAttribute('value', data.orderID);
+
+            f.appendChild(i);
+            $(document.body).append(f);
+            f.submit();
+
+            jQuery('.om-closing').remove();
+            jQuery('.om-loading-circle').remove();
+          });
+
+        }
+      });
     }
   });
 
@@ -268,7 +338,18 @@ jQuery(document).ready(function($) {
     },
     success: function(data) {
       if(data.success){
-        window.location = data.data.redirect;
+        var f = document.createElement("form");
+        f.setAttribute('method',"post");
+        f.setAttribute('action',data.data.redirect);
+
+        var i = document.createElement("input"); //input element, text
+        i.setAttribute('type',"hidden");
+        i.setAttribute('name',"doc");
+        i.setAttribute('value', $("#doc").val());
+
+        f.appendChild(i);
+        $(document.body).append(f);
+        f.submit();
       } else {
         console.log(data);
         alert(data.data);

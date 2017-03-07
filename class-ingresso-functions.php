@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ERROR);
 
 class VHR_Ingresso_Functions
 {
@@ -451,7 +452,7 @@ class VHR_Ingresso_Functions
 
     $status = $response->getStatus();
 
-    if($_POST['transactionCode'] == '' || isset($_POST['transactionCode'])){
+    if($_POST['transactionCode'] == '' || ! isset($_POST['transactionCode']) ){
       update_post_meta( $_POST['orderID'], 'transaction_state', 7);
       update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
     } else {

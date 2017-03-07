@@ -103,7 +103,7 @@ if(!class_exists('VHR_Users')){
 
       wp_send_json_success(array(
         'msg' => 'Usuario criado com sucesso.',
-        'redirect'  => home_url("/login")
+        'redirect'  => home_url("/conta")
       ));
     }
 

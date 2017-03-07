@@ -29,12 +29,12 @@ class VHR_Loja_Build
 			'template' => 'template/page-cadastrar.php'
 		),
 		array(
-			'name' => 'Login',
-			'template' => 'template/page-login.php'
-		),
-		array(
 			'name' => 'Conta',
 			'template' => 'template/page-conta.php'
+		),
+		array(
+			'name' => 'Resumo da Compra',
+			'template' => 'template/page-resumo-compra.php'
 		)
 	);
 

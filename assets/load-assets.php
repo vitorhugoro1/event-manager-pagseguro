@@ -21,7 +21,7 @@ function load_assets_front(){
   wp_enqueue_script( 'jquery-mask', plugin_dir_url( __FILE__ ) . 'js/jquery.mask.min.js', array('jquery'), '1.7.7' );
   wp_enqueue_script('front-validations', plugin_dir_url( __FILE__ ) . 'js/front-validations.js', array( 'jquery' ), '1.0');
 
-  if(is_page( 'confirmacao-pagamento' )){
+  if(is_page( 'selecionar-ingresso' )){
     $sandbox = get_option('sandbox', 0);
 
     if ($sandbox == 1){

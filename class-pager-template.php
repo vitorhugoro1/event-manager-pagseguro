@@ -74,7 +74,8 @@ class PageTemplater {
      'template/page-selecionar-ingresso.php' => 'Selecionar Ingresso',
      'template/page-confirmacao-pagamento.php' => 'Finalizar Pagamento',
      'template/page-cadastrar.php'  => 'Cadastrar',
-     'template/page-login.php'  => 'Login'
+     'template/page-conta.php'  => 'Conta',
+     'template/page-resumo-compra.php'  => 'Resumo da Compra',
    );
 
  }
