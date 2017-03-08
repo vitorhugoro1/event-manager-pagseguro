@@ -470,7 +470,7 @@ class VHR_Screens
 
               </div>
               <p>
-                <input type="button" onclick="window.location.href="<?=wp_logout_url( home_url() )?>"" value="Logout">
+                <input type="button" onclick='window.location.href="<?=wp_logout_url( home_url() )?>"' value="Logout">
               </p>
         <?php
         $content .= ob_get_clean();
@@ -501,7 +501,7 @@ class VHR_Screens
               <p>Donec id ligula et orci tempor vehicula sed suscipit orci. Aenean vel aliquam ligula, non consequat lacus.</p>
               <?php
               $args = array(
-                'redirect'       => ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+                'redirect'       => home_url(),
               	'label_username' => __( '' ),
               	'label_password' => __( '' ),
               	'label_remember' => __( 'Remember Me' ),

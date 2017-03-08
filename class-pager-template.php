@@ -72,7 +72,6 @@ class PageTemplater {
      'template/page-notificacao.php' => 'Notificação',
      'template/page-minha-conta.php' => 'Minha Conta',
      'template/page-selecionar-ingresso.php' => 'Selecionar Ingresso',
-     'template/page-confirmacao-pagamento.php' => 'Finalizar Pagamento',
      'template/page-cadastrar.php'  => 'Cadastrar',
      'template/page-conta.php'  => 'Conta',
      'template/page-resumo-compra.php'  => 'Resumo da Compra',

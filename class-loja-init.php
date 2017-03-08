@@ -5,10 +5,6 @@ class VHR_Loja_Build
 	protected $term_tipo = 'tipo-dia';
 	protected $pages = array(
 		array(
-			'name' => 'Confirmação Pagamento',
-			'template'	=> 'template/page-confirmacao-pagamento.php'
-		),
-		array(
 			'name' => 'Eventos',
 			'template'	=> 'template/page-eventos.php'
 		),

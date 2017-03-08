@@ -10,7 +10,7 @@ class VHR_Helpers
   {
     add_filter('wp_insert_post_data', array($this,'vhr_title_code'), '99', 2);
     add_filter('cmb2_show_on', array($this, 'vhr_exclude_from_new'), 10, 2);
-
+    add_filter( 'login_redirect', array($this, 'my_login_redirect'), 10, 3 );
   }
 
   function vhr_title_code($data, $postarr)
@@ -23,6 +23,20 @@ class VHR_Helpers
       return $data;
   }
 
+  function my_login_redirect( $redirect_to, $request, $user ) {
+  	//is there a user to check?
+  	if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+  		//check for admins
+  		if ( in_array( 'administrator', $user->roles ) ) {
+  			// redirect them to the default place
+  			return $redirect_to;
+  		} else {
+  			return home_url();
+  		}
+  	} else {
+  		return $redirect_to;
+  	}
+  }
 
   public function register_new_page($new_page_title, $new_page_content, $new_page_template)
   {
