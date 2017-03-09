@@ -414,6 +414,8 @@ class VHR_Ingresso_Functions
 
     $orderID = $this->insert_order($args);
 
+    update_post_meta( $orderID, 'ref', $this->pag_ref_gen($orderID) );
+
     $code = $this->pagseguro_init(array(
       'ref'       => $this->pag_ref_gen($orderID),
       'orderID'   => $orderID,
@@ -535,7 +537,8 @@ class VHR_Ingresso_Functions
         'transaction_state' => 1,
         'ingressos' => $args['ingressos'],
         'valor'     => $args['valor'],
-        'status'    => 'ativo'
+        'status'    => 'ativo',
+        'used'      => 0
       )
     );
 
@@ -641,20 +644,15 @@ class VHR_Ingresso_Functions
     $is_current = (get_post_meta($orderID, 'user_id', true) == $user_id) ? true : false;
 
     if($is_ref && $is_current){
-      $to = get_the_author_meta( 'user_email', $user_id );
-      $admin = get_option('admin_send_email') ? get_option('admin_send_email') : get_option('admin_email');
-      $blogname = get_option('blogname');
-      $headers = array("Content-Type: text/html; charset=UTF-8","From: $blogname <$admin>");
-      $subject = "Informações do ingresso #$orderID";
-      $message = wpautop( get_option( 'mail_template' ) );
+      $mail = new VHR_Helpers();
+      $email = $mail->mail_template_builder(array('orderID' => $orderID, 'user_id' => $user_id));
 
-      $mail = wp_mail( $to, $subject, $message, $headers );
-
-      if($mail){
-        wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
-      } else {
-        wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
-      }
+      return $email;
+      // if($email){
+      //   wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
+      // } else {
+      //   wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
+      // }
     }
 
   }

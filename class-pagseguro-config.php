@@ -173,16 +173,26 @@ class VHR_PagSeguro
               </th>
               <td>
                 <?php $mail_template = get_option('mail_template'); ?>
-                <textarea id="mail_template" name="mail_template" cols="80" rows="10" class="large-text" placeholder="Template de E-mail de Resposta"><?php echo esc_textarea( $mail_template ); ?></textarea>
+                <?php wp_editor( $mail_template, 'mail_template' ) ?>
+                <!-- <textarea id="mail_template" name="mail_template" cols="80" rows="10" class="large-text" placeholder="Template de E-mail de Resposta"><?php echo esc_textarea( $mail_template ); ?></textarea> -->
                 <p class="description">
                   Tags aceitas para completar valores automaticamente no corpo do e-mail:<br>
-                  <code>[qrcode]</code> : Adiciona a imagem do QRCODE no e-mail.<br>
+                  <code>[barcode]</code> : Adiciona a imagem do Código de Barra no e-mail.<br>
                   <code>[order]</code> : Adiciona o número do pedido.<br>
                   <code>[username]</code> : Adiciona o nome completo do cliente.<br>
                   <code>[firstname]</code> : Adiciona o primeiro nome do cliente.<br>
                   <code>[event]</code> : Adiciona o título do evento.<br>
                   <code>[purchasevalue]</code> : Adiciona o valor total da compra.<br>
-                  <code>[purchaseitems]</code> : Adiciona uma lista dos itens adquiridos da compra.
+                  <code>[purchaseitems]</code> : Adiciona uma lista dos itens adquiridos da compra. <br>
+                  <code>[transcationcode]</code> : Adiciona o código da transação no pagseguro.<br>
+                  <code>[orderdate]</code> : Adiciona a data do pedido.<br>
+                  <code>[address]</code> : Adiciona o endereço do usuário.<br>
+                  <code>[numberAddress]</code> : Adiciona o número do endereço do usuário.<br>
+                  <code>[compAddress]</code> : Adiciona o complemento do endereço do usuário.<br>
+                  <code>[cep]</code> : Adiciona o cep do endereço do usuário.<br>
+                  <code>[city]</code> : Adiciona a cidade do endereço do usuário.<br>
+                  <code>[state]</code> : Adiciona o estado do endereço do usuário.<br>
+                  <code>[cel]</code> : Adiciona o número do celular do usuário.
                 </p>
               </td>
             </tr>
@@ -200,7 +210,7 @@ class VHR_PagSeguro
     $token = sanitize_text_field($_POST['token']);
     $sandbox = $_POST['sandbox'];
     $acceptPayment = $_POST['acceptPayment'];
-    $mail_template = $_POST['mail_template'];
+    $mail_template = wp_kses_post($_POST['mail_template']);
     $mail_template_subject = $_POST['mail_template_subject'];
 
     update_option('email_pagseguro', $email);
