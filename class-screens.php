@@ -620,7 +620,7 @@ class VHR_Screens
                 </tr>
               </tfoot>
             </table>
-            <p>Você receberá um e-mail com a conformação de sua transação e instruções de como usar o seu ingresso.</p>
+            <p>Você receberá um e-mail com a confirmação de sua transação e instruções de como usar o seu ingresso.</p>
             <p>
               <input type="button" onclick='window.location.href="<?=home_url()?>"' value="Voltar para o site">
             </p>
