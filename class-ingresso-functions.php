@@ -500,7 +500,7 @@ class VHR_Ingresso_Functions
    * @return str/object
    */
 
-  protected function pag_ref_gen($id){
+  public function pag_ref_gen($id){
     if( empty($id) ) {
       return new WP_Error('format invalid', "Formato de informação invalído.");
     }
