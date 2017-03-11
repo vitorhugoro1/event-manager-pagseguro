@@ -425,4 +425,12 @@ jQuery(document).ready(function($) {
 
    });
 
+   $('.imprimir').on('click', function(e){
+     e.preventDefault();
+
+     var url = $(this).data('href');
+     $window = window.open(url, '', 'width=600,height=600');
+
+     $window.print();
+   });
 });

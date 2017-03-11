@@ -444,8 +444,11 @@ class VHR_Screens
 
                                          <input type="button" data-href="<?=$admin_post?>" data-action="resend_email" data-nonce="<?=$email_nonce?>" data-ref="<?=$ref?>" class="enviar-email" data-id="<?=$ingresso?>" value="Enviar e-mail">
 
-                                        <?php if ($state == 3): ?>
-                                          <input type="button" class="imprimir" data-id="<?=$ingresso?>" value="Imprimir">
+                                        <?php if ($state == 3):
+                                          $printnonce = wp_create_nonce('print_recibo');
+                                          $url = admin_url('admin-post.php') . "?action=print_recibo&_wpnonce=$printnonce&id=$ingresso";
+                                          ?>
+                                          <input type="button" class="imprimir" data-href="<?=$url?>" value="Imprimir">
                                         <?php endif; ?>
                                         <input type="button" class="cancelar" data-id="<?=$ingresso?>" value="Cancelar">
                                       <?php } ?>

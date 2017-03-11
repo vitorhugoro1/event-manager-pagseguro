@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ALL);
 /**
  *
  */
@@ -21,6 +21,7 @@ class VHR_Helpers
     add_filter('wp_insert_post_data', array($this,'vhr_title_code'), '99', 2);
     add_filter('cmb2_show_on', array($this, 'vhr_exclude_from_new'), 10, 2);
     add_filter( 'login_redirect', array($this, 'my_login_redirect'), 10, 3 );
+    add_action('admin_post_print_recibo', array($this, 'print_recibo'));
   }
 
   function vhr_title_code($data, $postarr)
@@ -99,7 +100,7 @@ class VHR_Helpers
     $blogname = get_option('blogname');
     $headers = array("Content-Type: text/html; charset=UTF-8","From: $blogname <$admin>");
     $subject = "Informações do ingresso #$orderID";
-    $message = wp_kses_post( $this->tags_fetch(get_option( 'mail_template' ),$orderID));
+    $message = $this->tags_fetch(get_option( 'mail_template' ),$orderID);
 
     $mail = wp_mail( $to, $subject, $message, $headers );
 
@@ -112,9 +113,10 @@ class VHR_Helpers
 
   protected function tags_fetch($html, $order){
     $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
-    $ref = get_post_meta($order, 'ref', true);
+    $in = new VHR_Ingresso_Functions;
+    $ref = (get_post_meta($order, 'ref', true)) ? get_post_meta($order, 'ref', true) : $in->pag_ref_gen($order);
     $user_id = get_post_meta($order, 'user_id', true);
-    $barcode = '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($ref, $generator::TYPE_CODE_128)) . '" width="400px">';
+    $barcode = '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($ref, $generator::TYPE_CODE_128)) . '" alt="Código de Barras" style="display:block;margin:0 auto;">';
     $username = get_the_author_meta( 'display_name', $user_id );
     $firstname = get_the_author_meta( 'first_name', $user_id );
     $event = get_the_title( get_post_meta( $order, 'evento_id', true ) );
@@ -151,14 +153,14 @@ class VHR_Helpers
       $total = get_post_meta($orderID, 'valor', true) ;
         $ingressos = get_post_meta($orderID,'ingressos', true);
         $evento_id = get_post_meta($orderID, 'evento_id', true );
-
+        $in = new VHR_Ingresso_Functions;
         if(!empty($ingressos)){
 
           foreach((array) $ingressos as $k => $ingresso):
               ?>
               <tr data-id="<?php echo $k; ?>">
                 <td>
-                  <?php echo self::get_valor_label($evento_id, $ingresso['tipo']); ?>
+                  <?php echo $in->get_valor_label($evento_id, $ingresso['tipo']); ?>
                 </td>
                 <td>
                   <?php echo $ingresso['qtd']; ?>
@@ -197,6 +199,30 @@ class VHR_Helpers
     $html = ob_get_clean();
 
     return $html;
+  }
+
+  public function print_recibo(){
+    $nonce = $_GET['_wpnonce'];
+    if(!wp_verify_nonce($nonce, 'print_recibo')){
+      return 'erro';
+    }
+
+    $orderID = $_GET['id'];
+
+    $html = $this->tags_fetch(get_option( 'mail_template' ),$orderID);
+
+    ?>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title></title>
+        </head>
+        <body>
+          <?php echo $html; ?>
+        </body>
+      </html>
+    <?php
   }
 }
 

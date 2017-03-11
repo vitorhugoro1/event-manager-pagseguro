@@ -473,6 +473,8 @@ class VHR_Ingresso_Functions
       $data['error'] = implode($errors, ',');
       wp_send_json_error( $data );
     } else {
+      $mail = new VHR_Helpers;
+      $mail->mail_template_builder(array('orderID' => $_POST['orderID'], 'user_id' => get_post_meta($_POST['orderID'], 'user_id', true)));
       $data['success'] = true;
       $data['id'] = $post_id;
       wp_send_json_success($data);
@@ -490,6 +492,9 @@ class VHR_Ingresso_Functions
 
     update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
     update_post_meta( $_POST['orderID'], 'transaction_state', 7 );
+
+    $mail = new VHR_Helpers;
+    $mail->mail_template_builder(array('orderID' => $_POST['orderID'], 'user_id' => get_post_meta($_POST['orderID'], 'user_id', true)));
 
     wp_send_json_success($_POST['orderID']);
   }
@@ -571,7 +576,7 @@ class VHR_Ingresso_Functions
 
     $payment = new \PagSeguro\Domains\Requests\Payment();
 
-    $valores = get_post_meta( $orderID, '_vhr_valores', true );
+    $valores = get_post_meta( get_post_meta($orderID, 'evento_id', true), '_vhr_valores', true );
     $home_url = home_url();
     $notificacao = home_url('/notificacao');
     $user_id = get_current_user_id();
@@ -611,9 +616,6 @@ class VHR_Ingresso_Functions
 
     $payment->addParameter()->withParameters('shippingAddressRequired', 'false');
     $payment->addParameter()->withParameters('acceptPaymentMethodGroup', 'CREDIT_CARD');
-    // $payment->addParameter()->withParameters('paymentMethodGroup1', 'CREDIT_CARD');
-    // $payment->addParameter()->withParameters('paymentMethodConfigKey1_1', 'MAX_INSTALLMENTS_NO_INTEREST');
-    // $payment->addParameter()->withParameters('paymentMethodConfigValue1_1', '6');
     $payment->setRedirectUrl($home_url);
     $payment->setNotificationUrl($notificacao);
 
@@ -647,12 +649,11 @@ class VHR_Ingresso_Functions
       $mail = new VHR_Helpers();
       $email = $mail->mail_template_builder(array('orderID' => $orderID, 'user_id' => $user_id));
 
-      return $email;
-      // if($email){
-      //   wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
-      // } else {
-      //   wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
-      // }
+      if($email){
+        wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
+      } else {
+        wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
+      }
     }
 
   }
