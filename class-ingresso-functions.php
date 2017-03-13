@@ -106,6 +106,29 @@ class VHR_Ingresso_Functions
         'name'    => 'Status da transação'
       ),
     ));
+
+    $used = new_cmb2_box(array(
+      'id' => 'used_metabox',
+      'title' => 'Ingresso utilizado',
+      'object_types' => array('ingresso'),
+      'context' => 'side',
+      'priority' => 'core',
+      'show_names' => false
+    ));
+
+    $used->add_field(array(
+      'id'    => 'used',
+      'title'  => 'Ingresso utilizado',
+      'type'    => 'select',
+      'options' => array(
+        false => 'Não',
+        true => 'Sim'
+      ),
+      'column'  => array(
+        'position'  => 4,
+        'name'    => 'Ingressso utilizado'
+      ),
+    ));
   }
 
   public function show_column_valor($field_args, $field ) {
@@ -414,7 +437,7 @@ class VHR_Ingresso_Functions
 
     $orderID = $this->insert_order($args);
 
-    update_post_meta( $orderID, 'ref', $this->pag_ref_gen($orderID) );
+    // update_post_meta( $orderID, 'ref', $this->pag_ref_gen($orderID) );
 
     $code = $this->pagseguro_init(array(
       'ref'       => $this->pag_ref_gen($orderID),
@@ -473,8 +496,19 @@ class VHR_Ingresso_Functions
       $data['error'] = implode($errors, ',');
       wp_send_json_error( $data );
     } else {
+      $orderID = $_POST['orderID'];
+
       $mail = new VHR_Helpers;
-      $mail->mail_template_builder(array('orderID' => $_POST['orderID'], 'user_id' => get_post_meta($_POST['orderID'], 'user_id', true)));
+      $to = get_the_author_meta( 'user_email', get_post_meta($orderID, 'user_id', true) );
+      $admin = get_option('admin_email');
+      $blogname = get_option('blogname');
+      $subject = "Informações do ingresso #$orderID";
+      $message = '<html><body>' . $mail->tags_fetch(get_option( 'mail_template' ), $orderID). '</body></html>';
+
+      $headers[] = "MIME-Version: 1.0";
+      $headers[] = "Content-type:text/html;charset=UTF-8";
+      wp_mail( $to, $subject, $message, $headers );
+
       $data['success'] = true;
       $data['id'] = $post_id;
       wp_send_json_success($data);
@@ -493,8 +527,18 @@ class VHR_Ingresso_Functions
     update_post_meta( $_POST['orderID'], 'status', 'cancelado' );
     update_post_meta( $_POST['orderID'], 'transaction_state', 7 );
 
+    $orderID = $_POST['orderID'];
+
     $mail = new VHR_Helpers;
-    $mail->mail_template_builder(array('orderID' => $_POST['orderID'], 'user_id' => get_post_meta($_POST['orderID'], 'user_id', true)));
+    $to = get_the_author_meta( 'user_email', get_post_meta($orderID, 'user_id', true) );
+    $admin = get_option('admin_email');
+    $blogname = get_option('blogname');
+    $subject = "Informações do ingresso #$orderID";
+    $message = '<html><body>' . $mail->tags_fetch(get_option( 'mail_template' ), $orderID). '</body></html>';
+
+    $headers[] = "MIME-Version: 1.0";
+    $headers[] = "Content-type:text/html;charset=UTF-8";
+    wp_mail( $to, $subject, $message, $headers );
 
     wp_send_json_success($_POST['orderID']);
   }
@@ -506,9 +550,9 @@ class VHR_Ingresso_Functions
    */
 
   public function pag_ref_gen($id){
-    if( empty($id) ) {
-      return new WP_Error('format invalid', "Formato de informação invalído.");
-    }
+    // if( empty($id) ) {
+    //   return new WP_Error('format invalid', "Formato de informação invalído.");
+    // }
 
     $ref = 'PAGRF';
     $ref .= date('Y');
@@ -646,14 +690,22 @@ class VHR_Ingresso_Functions
     $is_current = (get_post_meta($orderID, 'user_id', true) == $user_id) ? true : false;
 
     if($is_ref && $is_current){
-      $mail = new VHR_Helpers();
-      $email = $mail->mail_template_builder(array('orderID' => $orderID, 'user_id' => $user_id));
+      $mail = new VHR_Helpers;
+      $to = get_the_author_meta( 'user_email', $user_id );
+      $admin = get_option('admin_email');
+      $blogname = get_option('blogname');
+      $subject = "Informações do ingresso #$orderID";
+      $message = '<html><body>' . $mail->tags_fetch(get_option( 'mail_template' ), $orderID). '</body></html>';
 
-      if($email){
-        wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
-      } else {
-        wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
-      }
+      $headers[] = "MIME-Version: 1.0";
+	    $headers[] = "Content-type:text/html;charset=UTF-8";
+      wp_mail( $to, $subject, $message, $headers );
+      wp_send_json_error($to);
+      // if($email){
+      //   wp_send_json_success(array('msg' => 'Mensagem enviada com sucesso.'));
+      // } else {
+      //   wp_send_json_error(array('msg'  => 'Erro ao enviar a mensagem.'));
+      // }
     }
 
   }

@@ -22,6 +22,8 @@ class VHR_Helpers
     add_filter('cmb2_show_on', array($this, 'vhr_exclude_from_new'), 10, 2);
     add_filter( 'login_redirect', array($this, 'my_login_redirect'), 10, 3 );
     add_action('admin_post_print_recibo', array($this, 'print_recibo'));
+    add_action('admin_post_barcode_generator', array($this, 'barcode_generator'));
+    add_action('admin_post_nopriv_barcode_generator', array($this, 'barcode_generator'));
   }
 
   function vhr_title_code($data, $postarr)
@@ -63,6 +65,7 @@ class VHR_Helpers
       );
       if (!isset($page_check->ID)) {
           $new_page_id = wp_insert_post($new_page);
+          update_post_meta($new_page_id, 'eventerra_sidebar_show', 'hide');
           if (!empty($new_page_template)) {
               update_post_meta($new_page_id, '_wp_page_template', $new_page_template);
           }
@@ -104,25 +107,26 @@ class VHR_Helpers
 
     $mail = wp_mail( $to, $subject, $message, $headers );
 
-    if($mail){
-      return true;
-    } else {
-      return false;
-    }
+    return $mail;
+    // if($mail){
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   }
 
-  protected function tags_fetch($html, $order){
+  public function tags_fetch($html, $order){
     $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
     $in = new VHR_Ingresso_Functions;
-    $ref = (get_post_meta($order, 'ref', true)) ? get_post_meta($order, 'ref', true) : $in->pag_ref_gen($order);
+    $ref = (get_post_meta($order, 'transaction_id', true)) ? get_post_meta($order, 'transaction_id', true) : $in->pag_ref_gen($order);
     $user_id = get_post_meta($order, 'user_id', true);
-    $barcode = '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($ref, $generator::TYPE_CODE_128)) . '" alt="Código de Barras" style="display:block;margin:0 auto;">';
+    $barcode = '<img src="' . admin_url('admin-post.php') . '?action=barcode_generator&ref=' . $ref . '" alt="Código de Barras" style="display:block;margin:0 auto;">';
     $username = get_the_author_meta( 'display_name', $user_id );
     $firstname = get_the_author_meta( 'first_name', $user_id );
     $event = get_the_title( get_post_meta( $order, 'evento_id', true ) );
     $purchasevalue = 'R$ ' . get_post_meta( $order, 'valor', true );
     $purchaseitems = $this->get_order_html($order);
-    $transcationcode = get_post_meta( $post_id, 'notification_code', true );
+    $transcationcode = get_post_meta( $order, 'notification_code', true );
     $orderdate = get_the_date( 'd.m.Y H:i', $order );
     $cel = '(' . get_the_author_meta('ddd', $user_id). ') ' . get_the_author_meta('tel', $user_id);
 
@@ -223,6 +227,13 @@ class VHR_Helpers
         </body>
       </html>
     <?php
+  }
+
+  public function barcode_generator()
+  {
+    header("Content-type: image/png");
+    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+    echo $generator->getBarcode($_GET['ref'], $generator::TYPE_CODE_128);
   }
 }
 

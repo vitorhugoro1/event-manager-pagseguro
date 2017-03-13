@@ -30,7 +30,7 @@ class VHR_App_Api
     $args = array(
       'post_type'   => 'ingresso',
       'post_status' => 'publish',
-      'meta_key'    => 'ref',
+      'meta_key'    => 'transaction_id',
       'meta_value'  => $data['ref'],
       'numberposts' => 1,
       'fields'      => 'ids'
