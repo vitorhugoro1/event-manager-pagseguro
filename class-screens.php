@@ -102,27 +102,38 @@ class VHR_Screens
             $valores = get_post_meta($refID, '_vhr_valores', true); ?>
           <div class="om-columns">
             <div class="om-column om-full">
-                <em>Evento : <?=get_the_title($refID)?></em>
+                <h2>Evento : <?=get_the_title($refID)?></h2>
             </div>
-            <div class="om-column om-two-third">
-              <div class="select-ingresso">
-                <label for="tipo-ingresso">Selecione um ingresso</label>
+            <div class="om-column om-full">
+              <div class="select-ingresso m-h-64px">
+                <label for="tipo-ingresso">Selecione um ingresso: &nbsp;&nbsp;&nbsp;</label>
                 <select id="tipo-ingresso">
-                  <option value="">Selecione um ingresso</option>
+                  <option value="">Selecione um tipo</option>
                   <?php foreach ((array) $valores as $k => $valor) : ?>
                     <option value="<?=$k?>"><?=$valor['label']?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
-              <div class="qtd-ingresso">
-                <label for="qtd-ingresso">Quantidade de ingressos</label>
+              <div class="qtd-ingresso m-h-64px">
+                <div class="fl-l">  
+                <label for="qtd-ingresso">Quantidade de ingressos: &nbsp;&nbsp;&nbsp;</label>
                 <input type="number" id="qtd-ingresso" min="1" value="1">
+                </div>
+                <div class="fl-l">
+                    &nbsp;&nbsp;&nbsp;
+                    <input type="hidden" id="refID" value="<?=$refID?>">
+                    <input type="hidden" id="action-url" value="<?=admin_url('admin-post.php')?>">
+                    <input type="button" id="adc-ingresso" class="bt-add" value="Adicionar"/>
+                </div>
               </div>
             </div>
             <div class="om-column om-one-third">
+            <!--<div class="qtd-ingresso m-h-64px"></div>
+            <div class="qtd-ingresso m-h-64px">
               <input type="hidden" id="refID" value="<?=$refID?>">
               <input type="hidden" id="action-url" value="<?=admin_url('admin-post.php')?>">
               <input type="button" id="adc-ingresso" value="Adicionar"/>
+              </div>-->
             </div>
           </div>
           <div class="vc_om-table selecionar-table">
@@ -161,11 +172,12 @@ class VHR_Screens
                   </tr>
                 </tfoot>
               </table>
-              <p>
+              <div class="m-h-64px">
+              <br />
                 <input type="button" onclick="javascript:history.back();" value="Cancelar">
                 <input type="button" id="rmv-ingresso" value="Remover"/>
-                <input type="submit" value="Pagar"/>
-              </p>
+                <input type="submit" value="Pagar" class="bt-pagar"/>
+              </div>
             </form>
             <input type="hidden" id="resumo" value="<?=home_url('/resumo-da-compra')?>">
           </div>
@@ -265,15 +277,15 @@ class VHR_Screens
                      <div class="tab-content">
                          <div class="infos-cadastro">
                            <h4 class="tab-internal-title">Informações básicas</h4>
-                           <label>Nome</label>
+                           <label>Nome: </label>
                            <span data-id="name"><?php echo get_the_author_meta('display_name', $user_id); ?></span><br>
-                           <label>Email</label>
+                           <label>Email: </label>
                            <span data-id="email"><?php echo get_the_author_meta('email', $user_id); ?></span><br>
-                           <label>Celular</label>
+                           <label>Celular: </label>
                            <span data-id="tel"><?php echo get_the_author_meta('ddd', $user_id).' '.get_the_author_meta('tel', $user_id); ?></span><br>
-                           <label>Tipo de Conta</label>
+                           <label>Tipo de Conta: </label>
                            <span data-id="tipo"><?php echo ucfirst(get_the_author_meta('tipo', $user_id)) ?></span><br>
-                           <label>DOC</label>
+                           <label>DOC: </label>
                            <span data-id="doc"><?php echo get_the_author_meta('doc', $user_id) ?></span>
                          </div>
                          <div class="infos-compras">
@@ -353,33 +365,33 @@ class VHR_Screens
                          <div class="om-columns om-columns-s-pad">
                            <div class="om-column om-full">
                              <p>
-                               <label for="name">Nome*</label>
+                               <label for="name">Nome*: </label>
                                <input type="text" id="name" name="name" placeholder="Nome" required value="<?=$name?>">
                              </p>
                              <p>
-                               <label for="lastname">Sobrenome*</label>
+                               <label for="lastname">Sobrenome*: </label>
                                <input type="text" name="lastname" id="lastname" placeholder="Sobrenome" required value="<?=$sobrenome?>">
                              </p>
                              <p>
-                               <label for="email">Email*</label>
+                               <label for="email">Email*: </label>
                                <input type="email" id="email" name="email" placeholder="email@email.com" required value="<?=$email?>">
                              </p>
                              <p>
-                               <label for="telefone">Celular*</label>
+                               <label for="telefone">Celular*: </label>
                                <input type="text" id="ddd" name="ddd" placeholder="DDD" value="<?=$ddd?>" required>
                                <input type="text" id="telefone" name="tel" placeholder="00000-0000" value="<?=$tel?>" required>
                              </p>
                              <p>
-                               <label>Tipo de Conta*</label><br>
+                               <label>Tipo de Conta*: </label><br>
                                <label for="expositor"><input type="radio" id="expositor" name="tipo" <?php checked($tipo, 'expositor') ?> value="expositor"> Expositor</label>
                                <label for="visitante"><input type="radio" id="visitante" name="tipo" <?php checked($tipo, 'visitante') ?> value="visitante"> Visitante</label>
                              </p>
                              <p>
-                               <label for="doc">CPF*</label>
+                               <label for="doc">CPF*: </label>
                                <input type="text" id="doc" name="doc" placeholder="DOC" value="<?=$doc?>" required>
                              </p>
                              <p>
-                               <input type="submit" value="Atualizar">
+                               <input type="submit" value="Atualizar" class="bt-add">
                              </p>
                            </div>
                          </div>
@@ -442,13 +454,13 @@ class VHR_Screens
                                          $email_nonce = wp_create_nonce('resend_email');
                                          $ref = get_post_meta($ingresso, 'transaction_id', true); ?>
 
-                                         <input type="button" data-href="<?=$admin_post?>" data-action="resend_email" data-nonce="<?=$email_nonce?>" data-ref="<?=$ref?>" class="enviar-email" data-id="<?=$ingresso?>" value="Enviar e-mail">
+                                         <input type="button" data-href="<?=$admin_post?>" data-action="resend_email" data-nonce="<?=$email_nonce?>" data-ref="<?=$ref?>" class="enviar-email bt-add" data-id="<?=$ingresso?>" value="Enviar e-mail">
 
                                         <?php if ($state == 3):
                                           $printnonce = wp_create_nonce('print_recibo');
                                           $url = admin_url('admin-post.php') . "?action=print_recibo&_wpnonce=$printnonce&id=$ingresso";
                                           ?>
-                                          <input type="button" class="imprimir" data-href="<?=$url?>" value="Imprimir">
+                                          <input type="button" class="imprimir bt-add" data-href="<?=$url?>" value="Imprimir">
                                         <?php endif; ?>
                                         <input type="button" class="cancelar" data-id="<?=$ingresso?>" value="Cancelar">
                                       <?php } ?>
@@ -528,7 +540,80 @@ class VHR_Screens
             <form action="<?=admin_url('admin-post.php')?>" id="cadastrar_user" method="post">
               <input type="hidden" name="action" value="cadastrar_user">
               <?php wp_nonce_field( 'cadastrar_user' ) ?>
+
+
+               <div class="box-row">
+                <div class="w-260 fl-l">
+                  <p>
+                    <label for="name">Nome*</label>
+                    <input type="text" name="name" id="name" placeholder="Nome" required>
+                  </p>
+                </div>
+                 <div class="0-pct fl-l">
+                  <p>
+                    <label for="lastname">Sobrenome*</label>
+                    <input style="width:280px" type="text" name="lastname" id="lastname" placeholder="Sobrenome" required>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="box-row">
+                <div class="w-260 fl-l">
+                  <p>
+                    <label for="email">E-mail*</label>
+                    <input type="email" id="email" name="email" placeholder="email@email.com" autocomplete="off" required>
+                  </p>
+                </div>
+                <div class=" fl-l">
+                   <p>
+                    <label for="doc">CPF*</label>
+                    <input type="text" name="doc" id="doc" placeholder="DOC" value="<?=trim($_POST['doc'])?>" required>
+                  </p>
+                </div>
+               </div>  
+
+                <div class="box-row">
+                  <div class="w-260 fl-l">
+                    <p>
+                      <label for="pass">Senha*</label>
+                      <input type="password" id="pass" name="pass" placeholder="Digite uma senha" autocomplete="off" required>
+                    </p>
+                  </div>
+                  <div class=" fl-l">
+                    
+                  </div>
+                </div>  
+
+              
+               <div class="box-row">
+                <div class="w-50-pct fl-l">
+                  <label  for="tel-field">Telefone*</label><br>
+                    <div class=" fl-l">
+                      <input style="width:80px" type="text" id="ddd" name="ddd" placeholder="DDD" required>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class=" fl-l">
+                      <input type="text" id="tel" name="tel" placeholder="00000-0000" required>
+                    </div>
+                </div>
+                <div class="w-50-pct fl-l">
+                  
+                </div>
+               </div>  
+
+             <div class="box-row">
               <p>
+                <label>Tipo de Conta*</label><br>
+                <label for="expositor"><input type="radio" name="tipo" id="expositor" value="expositor"> Expositor</label>
+                <label for="visitante"><input type="radio" name="tipo" id="visitante" value="visitante"> Visitante</label>
+              </p>
+              </div>
+             
+              <div class="w-50-pct m-t-32">
+                <input class="m-t-32 bt-pagar" type="submit" value="Cadastrar" >
+              </div>
+
+              
+              <!--<p>
                 <label for="name">Nome*</label>
                 <input type="text" name="name" id="name" placeholder="Nome" required>
               </p>
@@ -562,7 +647,7 @@ class VHR_Screens
               </p>
               <p>
                 <input type="submit" value="Cadastrar">
-              </p>
+              </p> -->
             </form>
           <?php
         $content .= ob_get_clean();
@@ -625,7 +710,7 @@ class VHR_Screens
             </table>
             <p>Você receberá um e-mail com a confirmação de sua transação e instruções de como usar o seu ingresso.</p>
             <p>
-              <input type="button" onclick='window.location.href="<?=home_url()?>"' value="Voltar para o site">
+              <input type="button" class="bt-add" onclick='window.location.href="<?=home_url()?>"' value="Voltar para o site">
             </p>
           </div>
         <?php
