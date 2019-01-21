@@ -1,4 +1,4 @@
-# Plugin Loja WP PagSeguro
+# Gerenciamento de Eventos WordPress
 
 Este é um plugin criado para o público brasileiro que quer um sistema para gerenciar e criar eventos diversos utilizando o WordPress e o [PagSeguro](https://pagseguro.uol.com.br) como método de pagamento.
 
